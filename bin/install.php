@@ -15,4 +15,6 @@ $composerConfig = json_decode(file_get_contents($composerFile), true);
 $composerConfig["autoload"]["psr-4"]["App\\"] = ["app/"];
 $composerConfig["autoload"]["psr-4"]["Helper\\"] = ["helpers/"];
 file_put_contents($composerFile, json_encode($composerConfig, JSON_PRETTY_PRINT));
+copy($project_path . "/.env.example", $project_path . "/.env");
+
 shell_exec("composer dump-autoload");

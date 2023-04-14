@@ -1,5 +1,5 @@
 {
-  "default": {
+  "prod": {
     "dbname": "framework_sidunis",
     "host": "localhost",
     "port": 3306,

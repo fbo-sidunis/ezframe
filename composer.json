@@ -9,7 +9,8 @@
         "components/jquery": "~3.0",
         "phpmailer/phpmailer": "^6.5",
         "monolog/monolog": "^2.3",
-        "nadar/quill-delta-parser": "^3.0"
+        "nadar/quill-delta-parser": "^3.0",
+        "symfony/dotenv": "^6.2"
     },
     "autoload": {
         "psr-4": {

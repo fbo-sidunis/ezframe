@@ -3,6 +3,8 @@ export class Autocomplete{
   _input;
   /** @type {HTMLDataListElement} */
   _datalist = null;
+  /** @type {HTMLUListElement} */
+  _dropdown = null;
   /** @type {number} */
   _timer = null;
   /** @type {number} */
@@ -23,6 +25,8 @@ export class Autocomplete{
   _choices = {};
   /** @type {boolean} */
   _disabled = false;
+  /** @type {string} */
+  _mode = "datalist";
 
   /**
    * Constructeur
@@ -42,31 +46,24 @@ export class Autocomplete{
 
   init(){
     this.input.addEventListener("input",this.getOnInput());
-    this.datalist = this.datalist;
-  }
-
-  getOnKeyPress(){
-    return e => {
-      this.datalist.innerHTML = "";
-      clearTimeout(this.timer);
-      this.timer = setTimeout(()=>{
-        this.autocomplete();
-      },this.timeout);
+    if (this.mode == "dropdown"){
+      this.dropdown = this.dropdown;
+    }else if (this.mode == "datalist"){
+      this.datalist = this.datalist;
     }
   }
 
   getOnInput(){
     return e => {
-      console.log(e.inputType,this.input.value);
+      this.clearDatalist();
+      this.hideDropdown();
       if ((e.inputType ?? null) && e.inputType != "insertReplacementText"){
-        this.datalist.innerHTML = "";
         clearTimeout(this.timer);
         this.timer = setTimeout(()=>{
           this.autocomplete();
         },this.timeout);
       }else{
         this._callbackOnSelect(this.input.value,this.getChoiceByValue(this.input.value),this.input);
-        this.datalist.innerHTML = "";
       }
     }
   }
@@ -88,10 +85,77 @@ export class Autocomplete{
         if (this.disabled) return null;
         if (response.result != 1) return console.error(response.message);
         this.choices = response.data.choices;
+        if (this.mode == "dropdown"){
+          this.updateDropdown();
+          this.showDropdown();
+        }
       }
     })
   }
 
+  clearDatalist(){
+    if (this.mode == "dropdown") return null;
+    this.datalist.innerHTML = "";
+  }
+
+  clearDropdown(){
+    if (this.mode == "datalist") return null;
+    this.dropdown.innerHTML = "";
+  }
+
+  showDropdown(){
+    if (this.mode == "datalist") return null;
+    this.dropdown.classList.remove("d-none");
+  }
+  
+  hideDropdown(){
+    if (this.mode == "datalist") return null;
+    this.dropdown.classList.add("d-none");
+  }
+
+  getChoiceByValue(value){
+    return this.choices[value] ?? null;
+  }
+
+  updateDatalist(){
+    this.clearDatalist();
+    foreach(this._choices,choice=>{
+      createElement({
+        tagName : "option",
+        attrs : {
+          value : choice.value,
+          innerText : choice.label,
+        },
+        parent : this.datalist,
+        // dataset : choice.dataset,
+      });
+    });
+  }
+
+  updateDropdown(){
+    this.clearDropdown();
+    foreach(this._choices,choice=>{
+      let item = createElement({
+        tagName : "li",
+        children : [
+          {
+            tagName : "button",
+            attrs : {
+              type : "button",
+              className : "dropdown-item",
+              innerText : choice.label,
+            },
+            // dataset : choice.dataset,
+          }
+        ],
+        parent : this.dropdown,
+      });
+      item.querySelector("button").addEventListener("click",e=>{
+        this._callbackOnSelect(choice.value,choice,this.input);
+        this.hideDropdown();
+      });
+    });
+  }
   
   get input() {
     return this._input;
@@ -121,6 +185,7 @@ export class Autocomplete{
         parent : this.input.parentNode,
       });
       this.input.setAttribute("list",id);
+      this.input.parentNode.insertBefore(this._datalist,this.input.nextSibling);
     }
     return this._datalist;
   }
@@ -135,6 +200,75 @@ export class Autocomplete{
       throw "Le datalist donné est invalide"
     }
     this._datalist = _value;
+  }
+  get dropdown() {
+    if (!this._dropdown && this.input){
+      let id = this.input.id + "_dropdown";
+      this._dropdown = createElement({
+        tagName : "ul",
+        attrs : {
+          id : id,
+          className : "dropdown-menu d-none",
+        },
+        style : {
+          position : "absolute",
+        },
+        parent : this.input.parentNode,
+      });
+      this.input.setAttribute("list",id);
+      this.input.parentNode.insertBefore(this._dropdown,this.input.nextSibling);
+    }
+    return this._dropdown;
+  }
+  set dropdown(value) {
+    let _value = null;
+    if (value instanceof HTMLElement){
+      _value = value;
+    }else if (typeof(value) == "string"){
+      _value = document.querySelector(value);
+    }
+    if (!(_value instanceof HTMLUListElement)){
+      throw "Le ulist donné est invalide"
+    }
+    this._dropdown = value;
+  }
+
+  get choices() {
+    return this._choices;
+  }
+
+  set choices(value) {
+    if (!value instanceof Array) throw "choices invalide"
+    this._choices = {};
+    foreach (value,choice=>{
+      let value = !(choice instanceof Object) ? choice.trim() : this._callbackValue(choice);
+      this._choices[value] = {
+        value : value,
+        label : !(choice instanceof Object) ? choice.trim() : this._callbackLabel(choice),
+        dataset : (choice instanceof Object) ? choice : {},
+      };
+    });
+    if (this.mode == "datalist"){
+      this.updateDatalist();
+    }
+    if (this.mode == "dropdown"){
+      this.updateDropdown();
+    }
+  }
+
+  get callbackLabel() {
+    return this._callbackLabel;
+  }
+  set callbackLabel(value) {
+    this._callbackLabel = value;
+  }
+
+  get mode() {
+    return this._mode;
+  }
+  set mode(value) {
+    if (!["datalist","dropdown"].includes(value)) throw "Mode invalide";
+    this._mode = value;
   }
 
   get timer() {
@@ -181,52 +315,5 @@ export class Autocomplete{
   set callbackOnSelect(value) {
     if (!value instanceof Function) throw "callbackOnSelect invalide"
     this._callbackOnSelect = value;
-  }
-
-  get choices() {
-    return this._choices;
-  }
-
-  set choices(value) {
-    if (!value instanceof Array) throw "choices invalide"
-    this._choices = {};
-    foreach (value,choice=>{
-      let value = !(choice instanceof Object) ? choice.trim() : this._callbackValue(choice);
-      this._choices[value] = {
-        value : value,
-        label : !(choice instanceof Object) ? choice.trim() : this._callbackLabel(choice),
-        dataset : (choice instanceof Object) ? choice : {},
-      };
-    });
-    this.datalist.innerHTML = "";
-    foreach(this._choices,choice=>{
-      createElement({
-        tagName : "option",
-        attrs : {
-          value : choice.value,
-          innerText : choice.label,
-        },
-        parent : this.datalist,
-        dataset : choice.dataset,
-      });
-    });
-  }
-
-  get callbackLabel() {
-    return this._callbackLabel;
-  }
-  set callbackLabel(value) {
-    this._callbackLabel = value;
-  }
-
-  getChoiceByValue(value){
-    return this.choices[value] ?? null;
-  }
-
-  disableTemporarily(){
-    this.disabled = true;
-    setTimeout(()=>{
-      this.disabled = false;
-    },this.timeout+100);
   }
 }

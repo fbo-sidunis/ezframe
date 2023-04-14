@@ -5,6 +5,8 @@ export class Autocomplete{
   _datalist = null;
   /** @type {HTMLUListElement} */
   _dropdown = null;
+  /** @type {HTMLDivElement} */
+  _dropdownContainer = null;
   /** @type {number} */
   _timer = null;
   /** @type {number} */
@@ -47,6 +49,7 @@ export class Autocomplete{
   init(){
     this.input.addEventListener("input",this.getOnInput());
     if (this.mode == "dropdown"){
+      this.dropdownContainer = this.dropdownContainer;
       this.dropdown = this.dropdown;
     }else if (this.mode == "datalist"){
       this.datalist = this.datalist;
@@ -105,12 +108,12 @@ export class Autocomplete{
 
   showDropdown(){
     if (this.mode == "datalist") return null;
-    this.dropdown.classList.remove("d-none");
+    this.dropdown.classList.add("show");
   }
   
   hideDropdown(){
     if (this.mode == "datalist") return null;
-    this.dropdown.classList.add("d-none");
+    this.dropdown.classList.remove("show");
   }
 
   getChoiceByValue(value){
@@ -208,7 +211,7 @@ export class Autocomplete{
         tagName : "ul",
         attrs : {
           id : id,
-          className : "dropdown-menu d-none",
+          className : "dropdown-menu",
         },
         style : {
           position : "absolute",
@@ -230,7 +233,36 @@ export class Autocomplete{
     if (!(_value instanceof HTMLUListElement)){
       throw "Le ulist donné est invalide"
     }
-    this._dropdown = value;
+    this._dropdown = _value;
+  }
+
+  get dropdownContainer() {
+    if (!this._dropdownContainer && this.input){
+      let id = this.input.id + "_dropdown_container";
+      this._dropdownContainer = createElement({
+        tagName : "div",
+        attrs : {
+          id : id,
+          className : "dropdown",
+        },
+        parent : this.input.parentNode,
+      });
+      this.input.parentNode.insertBefore(this._dropdownContainer,this.input);
+      this._dropdownContainer.appendChild(this.input);
+    }
+    return this._dropdownContainer;
+  }
+  set dropdownContainer(value) {
+    let _value = null;
+    if (value instanceof HTMLElement){
+      _value = value;
+    }else if (typeof(value) == "string"){
+      _value = document.querySelector(value);
+    }
+    if (!(_value instanceof HTMLDivElement)){
+      throw "La div donné est invalide"
+    }
+    this._dropdownContainer = _value;
   }
 
   get choices() {

@@ -49,10 +49,18 @@ export class Autocomplete{
   init(){
     this.input.addEventListener("input",this.getOnInput());
     if (this.mode == "dropdown"){
-      this.dropdownContainer = this.dropdownContainer;
-      this.dropdown = this.dropdown;
+      this.dropdownContainer
+      this.dropdown
+      this.input.addEventListener("click",e=>{
+        this.hideDropdown();
+      });
+      this.input.addEventListener("blur",e=>{
+        //si on clique sur un élément du dropdown, on ne doit pas le cacher
+        if (e.relatedTarget && e.relatedTarget.closest(".dropdown-menu")) return null;
+        this.hideDropdown();
+      });
     }else if (this.mode == "datalist"){
-      this.datalist = this.datalist;
+      this.datalist
     }
   }
 

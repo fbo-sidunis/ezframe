@@ -1,0 +1,127 @@
+{
+  "/": {
+    "alias": "home",
+    "sitemap" : true,
+    "vars": {
+      "p": "home:default:render" ,
+      "fallback" : "login",
+      "t" : "home/home.html.twig"
+    }
+  },
+  "/admin/": {
+    "sitemap" : true,
+    "alias": "admin-user",
+    "vars": {
+      "m": "Admin",
+      "c": "user",
+      "f": "render"
+    }
+  },
+  "/account/": {
+    "sitemap" : {
+      "valuetest" : {
+        "function" : ["\\Core\\Route", "testForSitemap"],
+        "args" : []
+      }
+    },
+    "alias": "mon-compte",
+    "vars": {
+      "p": "auth:compte:getCompte"
+    }
+  },
+  "/passwordreset/": {
+    "alias": "change-password",
+    "vars": {
+      "p": "auth:password:getCompte"
+    }
+  },
+  "/user/sendNewPass/": {
+    "alias": "user_sendNewPass",
+    "vars": {
+      "m": "user",
+      "c": "user",
+      "f": "sendNewPass"
+    }
+  },
+  "/user/ajax_updatePass/": {
+    "alias": "user_ajax_updatePass",
+    "vars": {
+      "m": "admin",
+      "c": "user",
+      "f": "ajax_updatePass"
+    }
+  },
+  "/user/ajax_delete/": {
+    "alias": "user_ajax_delete",
+    "vars": {
+      "m": "admin",
+      "c": "user",
+      "f": "ajax_delete"
+    }
+  },
+  "/user/ajax_activate/": {
+    "alias": "user_ajax_activate",
+    "vars": {
+      "m": "admin",
+      "c": "user",
+      "f": "ajax_activate"
+    }
+  },
+  "/user/ajax_insertUser/": {
+    "alias": "user_ajax_insertUser",
+    "vars": {
+      "m": "admin",
+      "c": "user",
+      "f": "ajax_insertUser"
+    }
+  },
+  "/user/ajax_updateUser/": {
+    "alias": "user_ajax_updateUser",
+    "vars": {
+      "m": "admin",
+      "c": "user",
+      "f": "ajax_updateUser"
+    }
+  },
+  "/user/ajax_getUserById/": {
+    "alias": "user_ajax_getUserById",
+    "vars": {
+      "m": "admin",
+      "c": "user",
+      "f": "ajax_getUserById"
+    }
+  },
+  "/user/ajax_getUsers/": {
+    "alias": "user_ajax_getUsers",
+    "vars": {
+      "m": "admin",
+      "c": "user",
+      "f": "ajax_getUsers"
+    }
+  },
+  "/auth/ajax_save/": {
+    "alias": "auth_ajax_save",
+    "vars": {
+      "m": "auth",
+      "c": "password",
+      "f": "ajax_save"
+    }
+  },
+  "/user/ajax_save/": {
+    "alias": "user_ajax_save",
+    "vars": {
+      "m": "auth",
+      "c": "compte",
+      "f": "ajax_save"
+    }
+  },
+  "/utilisateurs/": {
+    "alias": "utilisateurs",
+    "vars": {
+      "p": "home:default:render",
+      "t": "admin/users.html.twig",
+      "access": ["ADM"],
+      "fallback": "home"
+    }
+  }
+}

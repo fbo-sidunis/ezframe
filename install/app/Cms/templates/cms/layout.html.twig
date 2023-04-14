@@ -1,0 +1,56 @@
+{# layout.html.twig #}
+<!DOCTYPE html>
+<html lang="fr">
+  {% if xdebug == 2 %}
+    {% set xdtemplate = _self %}
+    {% include 'xdeb2.html.twig' %}
+  {% endif %}
+  {% block head %}
+    <head>
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="robots" content="noindex, nofollow">
+      <meta charset="UTF-8">
+      {% block title %}<title>{{ SITE_TITLE }}</title>{% endblock %}
+      <link rel="stylesheet" href="https://use.typekit.net/ezm0tzl.css">
+      <link href="https://fonts.googleapis.com/css?family=Lato:100,100i,300,300i,400,400i,700,700i,900,900i" rel="stylesheet">
+      <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p" crossorigin="anonymous"></script>
+      <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.18/dist/sweetalert2.all.min.js"></script>
+      <script src="https://kit.fontawesome.com/a6ef21a305.js" crossorigin="anonymous"></script>
+      <script src="https://unpkg.com/isotope-layout@3/dist/isotope.pkgd.min.js"></script>
+      {{jsconst("SITE_TITLE",SITE_TITLE)}}
+      {{jsconst("ROOT_URL",ROOT_URL)}}
+      {{jsconst("SITE_URL",SITE_URL)}}
+      {{jsconst("ROUTES",Route.getRoutes())}}
+      {{jsconst("DEBUG",SITE.CONFIG.DEBUG)}}
+      {{jsconst("AUTODEBUG",SITE.CONFIG.AUTODEBUG)}}
+      {{style("vendor/twbs/bootstrap/dist/css/bootstrap.min.css")}}
+      {{script("cores/common/js/functions.js",{defer:false})}}
+      {{script("cores/common/js/class/Route.js",{defer:false})}}
+      {{script("vendor/components/jquery/jquery.min.js",{defer:false})}}
+      {{script("cores/common/js/ajax.js",{defer:false})}}
+      {{script("vendor/twbs/bootstrap/dist/js/bootstrap.min.js",{defer:false})}}
+      {{script("libs/bootstrap-select/bootstrap-select.min.js",{defer:false})}}
+      {{script("libs/bootstrap-select/i18n/defaults-fr_FR.min.js",{defer:false})}}
+      {{style("libs/bootstrap-select/bootstrap-select.min.css")}}
+      {% block include_libs %}{% endblock %}
+      {% block include_additional_libs %}{% endblock %}
+    </head>
+  {% endblock %}
+  <body id="p_body">
+    <div id="extranet_container">
+      <i data-feather="circle"></i>
+
+      {% block nav %}
+        <header id="main_header">
+        </header>
+      {% endblock %}
+      <main class="container-fluid" id="main_content"> 
+        {% block body %}
+        {% endblock %}
+        {% block debug %}
+          {% include 'view_debug.html.twig' %}
+        {% endblock %}
+      </main>
+    </div>
+  </body>
+</html>

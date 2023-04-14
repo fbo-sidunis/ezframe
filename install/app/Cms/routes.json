@@ -1,0 +1,132 @@
+{
+  "/cms/blocks/": {
+    "alias": "cms_blocks_list",
+    "vars": {
+      "m": "Cms",
+      "c": "blocks",
+      "f": "render"
+    }
+  },
+  "/cms/blocks/ajax/delete/": {
+    "alias": "cms_blocks_ajax_delete",
+    "vars": {
+      "m": "Cms",
+      "c": "blocks",
+      "f": "delete"
+    }
+  },
+  "/cms/blocks/ajax/list/": {
+    "alias": "cms_blocks_ajax_list",
+    "vars": {
+      "m": "Cms",
+      "c": "blocks",
+      "f": "list"
+    }
+  },
+  "/cms/blocks/ajax/save/": {
+    "alias": "cms_blocks_ajax_save",
+    "vars": {
+      "m": "Cms",
+      "c": "blocks",
+      "f": "save"
+    }
+  },
+  "/cms/menu/": {
+    "alias": "cms_menu_list",
+    "vars": {
+      "m": "Cms",
+      "c": "Menu",
+      "f": "render",
+      "t": "cms/menus/menu_list.html.twig"
+    }
+  },
+  "/cms/menu/ajax/list/": {
+    "alias": "cms_menu_ajax_list",
+    "vars": {
+      "m": "Cms",
+      "c": "Menu",
+      "f": "list"
+    }
+  },
+  "/cms/menu/ajax/save/": {
+    "alias": "cms_menu_ajax_save",
+    "vars": {
+      "m": "Cms",
+      "c": "Menu",
+      "f": "save"
+    }
+  },
+  "/cms/menu/ajax/delete/{id}/": {
+    "alias": "cms_menu_ajax_delete",
+    "vars": {
+      "m": "Cms",
+      "c": "Menu",
+      "f": "delete"
+    }
+  },
+  "/cms/layout/": {
+    "alias": "cms_layout_list",
+    "vars": {
+      "m": "Cms",
+      "c": "Layout",
+      "f": "render",
+      "t": "cms/layouts/layout_list.html.twig"
+    }
+  },
+  "/cms/layout/ajax/list/": {
+    "alias": "cms_layout_ajax_list",
+    "vars": {
+      "m": "Cms",
+      "c": "Layout",
+      "f": "list"
+    }
+  },
+  "/cms/layout/ajax/save/": {
+    "alias": "cms_layout_ajax_save",
+    "vars": {
+      "m": "Cms",
+      "c": "Layout",
+      "f": "save"
+    }
+  },
+  "/cms/layout/ajax/delete/{id}/": {
+    "alias": "cms_layout_ajax_delete",
+    "vars": {
+      "m": "Cms",
+      "c": "Layout",
+      "f": "delete"
+    }
+  },
+  "/cms/pages/": {
+    "alias": "cms_pages_list",
+    "vars": {
+      "m": "Cms",
+      "c": "pages",
+      "f": "render"
+    }
+  },
+  "/cms/pages/ajax/delete/": {
+    "alias": "cms_pages_ajax_delete",
+    "vars": {
+      "m": "Cms",
+      "c": "pages",
+      "f": "delete"
+    }
+  },
+  "/cms/pages/ajax/list/": {
+    "alias": "cms_pages_ajax_list",
+    "vars": {
+      "m": "Cms",
+      "c": "pages",
+      "f": "list"
+    }
+  },
+  "/cms/pages/ajax/save/": {
+    "alias": "cms_pages_ajax_save",
+    "vars": {
+      "m": "Cms",
+      "c": "pages",
+      "f": "save"
+    }
+  }
+}

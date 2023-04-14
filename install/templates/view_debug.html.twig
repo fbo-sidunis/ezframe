@@ -1,0 +1,63 @@
+{# view_debug.html.twig #}
+{% if xdebug == 1 and SITE.CONFIG.DEBUG %}
+  <div id="zone_debug" class="container-fluid" style="font-size:s10px !important">
+    <div id="div_debug" 
+         class='col-md-12 
+         col-sm-12
+         col-xs-10'>
+      <div class="row">
+        {% for Key,Value in DEBUG %}
+          <div id="d_{{ Key }}" class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
+            {% if Key == 'ERREURS' %}
+              <div class="card bg-warning mb-3  border-dark">
+            {% else %}
+              <div class="card bg-light mb-3  border-dark">
+            {% endif %}
+                <div class="card-header">
+                  {{ Key|upper }}
+                </div>
+                <div class="card-body">
+                  {{ dump(Value) }}
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+          <div class="col-xs-12 col-sm-12 col-md-6 col-md-6">
+            <div class="card bg-info text-white mb-3 border-dark">
+              <div class="card-header">
+                TEMPLATES
+              </div>
+              <div class="card-body">
+                {% for tmpl in template %}
+                  {{ tmpl }}
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+          <div class="col-xs-12 col-sm-12 col-md-6 col-md-6">
+            <div class="card bg-warning text-white mb-3 border-dark">
+              <div class="card-header">
+                DATAS IN TEMPLATE
+              </div>
+              <div class="card-body">
+                <pre>
+                  {{ dump() }}
+                </pre>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+      (function () {
+        debug('JS Start...');
+      })();
+      $(document).ready(function () {
+        debug('Jquery ok.');
+      });
+
+    </script>
+  {% endif %}
+
+  

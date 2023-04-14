@@ -1,0 +1,52 @@
+<div id="add_block" class="modal fade" tabindex="-1" aria-labelledby="add_block_label" aria-hidden="true">
+  <div class="modal-dialog modal-fullscreen">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="add_block_label">Ajouter un nouveau bloc</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> 
+      </div>
+      <div class="modal-body">
+        {% set formBlock = formBuilder("block") %}
+        {{formBlock.begin()}}
+          {{formBlock.input("id",{
+            type:"input",
+            attributes:{
+              type:"hidden",
+              "data-col":"id"
+            }
+          })}}
+          {{formBlock.group("libelle",{
+            label:"Libelle",
+            type:"input",
+            attributes:{
+              "data-col":"libelle"
+            }
+          })}}
+          {{formBlock.group("layout",{
+            label:"Layout",
+            type:"select",
+            emptyChoice:"Aucun layout sélectionné",
+            choices:LAYOUTS|map(a => {label:a.libelle,value:a.id,attributes:{"data-html":a.html}}),
+            attributes:{
+              "data-col":"id_layout"
+            }
+          })}}
+          {{formBlock.group("content",{
+            label:"Contenu",
+            type:"input",
+            attributes:{
+              "data-col":"content",
+              type:"hidden"
+            },
+            group_attributes:{
+              style:"display:none;"
+            }
+          })}}
+        {{formBlock.end()}}
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" id="btn_save_block"><i class="fas fa-save"></i> Enregistrer</button>
+      </div>
+    </div>
+  </div>
+</div>

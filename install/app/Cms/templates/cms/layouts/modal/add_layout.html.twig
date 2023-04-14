@@ -1,0 +1,69 @@
+<div id="add_layout" class="modal fade" tabindex="-1" aria-labelledby="add_layout_label" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="add_layout_label">Ajouter une nouveau layout</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> 
+      </div>
+      <div class="modal-body">
+        {% set formLayout = formBuilder("layout") %}
+        {{formLayout.begin()}}
+          {{formLayout.input("id",{
+            type:"input",
+            attributes:{
+              type:"hidden",
+              "data-col":"id"
+            }
+          })}}
+          {{formLayout.group("libelle",{
+            label:"Libelle",
+            type:"input",
+            attributes:{
+              placeholder:"Libelle du layout",
+              "data-col":"libelle"
+            }
+          })}}
+          {{formLayout.group("template_path",{
+            label:"Chemin du template",
+            type:"input",
+            attributes:{
+              placeholder:"Chemin du template",
+              "data-col":"template_path"
+            }
+          })}}
+          {{formLayout.group("template_back_path",{
+            label:"Chemin du template du back",
+            type:"input",
+            attributes:{
+              placeholder:"Chemin du template du back",
+              "data-col":"template_back_path"
+            }
+          })}}
+          {{formLayout.group("nb_content",{
+            label:"Nombre de contenu",
+            type:"input",
+            attributes:{
+              "data-col":"nb_content",
+              "type":"number"
+            }
+          })}}
+          {{formLayout.group("type",{
+            label:"Type de layout",
+            type:"checkboxes",
+            choices:[
+              {value:"contenu",label:"Contenu"},
+              {value:"image",label:"Image"},
+              {value:"diaporama",label:"Diaporama"}
+            ],
+            attributes:{
+              "data-col":"type"
+            }
+          })}}
+        {{formLayout.end()}}
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" id="btn_save_layout"><i class="fas fa-save"></i> Enregistrer</button>
+      </div>
+    </div>
+  </div>
+</div>

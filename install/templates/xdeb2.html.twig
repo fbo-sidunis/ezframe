@@ -1,0 +1,12 @@
+{% if xdebug == 2 and SITE.CONFIG.ENV == "dev" %}
+	<span class="xdb2">
+		{{ xdtemplate }}
+	</span>
+	<style>
+	.xdb2 {
+		color : red;
+		font-size : 12px;
+		font-style : italic;
+	}
+	</style>
+{% endif %}

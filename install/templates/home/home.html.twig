@@ -1,0 +1,23 @@
+{% extends "layout.html.twig" %}
+{% block body %}
+  {% if xdebug == 2 %}
+    {% set xdtemplate = _self %}
+    {% include 'xdeb2.html.twig' %}
+  {% endif %}
+  <div class="mx-auto">
+    <div class="card text-center">
+      <div class="card-header">
+        Hello World !
+      </div>
+      <div class="card-body">
+        <h5 class="card-title">
+          Framework Sidunis
+        </h5>
+        <p class="card-text"></p>
+      </div>
+      <div class="card-footer text-muted">
+        À vos claviers !
+      </div>
+    </div>
+  </div>
+{% endblock %}

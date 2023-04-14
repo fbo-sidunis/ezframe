@@ -1,0 +1,20 @@
+{% if xdebug == 2 %}
+  {% set xdtemplate = _self %}
+  {% include 'xdeb2.html.twig' %}
+{% endif %}
+<table class="table table-hover table-condensed table-bordered" id="table_users" style="margin-left: 5%; margin-top: 2%">
+  <thead class="thead-dark">
+    <tr>
+      <th>#</th>
+      <th>Nom</th>
+      <th>Prénom</th>
+      <th>Mail</th>
+      <th>Dernière connexion</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody id="tbody_tbl_user">
+    
+  </tbody>
+</table>
+

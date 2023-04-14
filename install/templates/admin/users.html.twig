@@ -1,0 +1,26 @@
+{% extends "layout.html.twig" %}
+{% block body %}
+  {% if xdebug == 2 %}
+    {% set xdtemplate = _self %}
+    {% include 'xdeb2.html.twig' %}
+  {% endif %}
+  <div class="col-md-12">
+    <div class="row">
+      {% include 'admin/blocks/flt_users.html.twig' %}
+      <button id="btn_add_user" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#mdl_add_user">
+        <i class="fas fa-plus" style="color:white"></i>
+        Ajouter un utilisateur    
+      </button>
+      {% include 'admin/blocks/mdl_add_user.html.twig' %}
+    </div>
+    <div class="row" style="margin-right: 9%">
+      <div id="tbl_users" class="table table-responsive-md">
+        {% include 'admin/blocks/tbl_users.html.twig' %}
+      </div>
+      {% include 'admin/blocks/mdl_confirmed_suppr.html.twig' %}
+      {% include 'admin/blocks/mdl_edit_user.html.twig' %}
+      {% include 'admin/blocks/mdl_reset_pwd.html.twig' %}
+    </div>
+  </div>
+  <script src="{{ ROOT_URL }}assets/js/user.js"></script>
+{% endblock %}

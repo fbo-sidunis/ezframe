@@ -1,0 +1,46 @@
+<div id="add_page" class="modal fade" tabindex="-1" aria-labelledby="add_page_label" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="add_page_label">Ajouter une nouvelle page</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> 
+      </div>
+      <div class="modal-body">
+        {% set formPage = formBuilder("page") %}
+        {{formPage.begin()}}
+          {{formPage.input("id",{
+            type:"input",
+            attributes:{
+              type:"hidden",
+              "data-col":"id"
+            }
+          })}}
+          {{formPage.group("libelle",{
+            label:"Libelle",
+            type:"input",
+            attributes:{
+              placeholder:"Libelle de la page",
+              "data-col":"libelle"
+            }
+          })}}
+          {{formPage.group("type",{
+            label:"Type de page",
+            type:"select",
+            emptyChoice:"Aucun type sélectionné",
+            choices:[
+              {value:"ARTICLE",label:"ARTICLE"},
+              {value:"BLOG",label:"BLOG"},
+              {value:"AUTRE",label:"AUTRE"}
+            ],
+            attributes:{
+              "data-col":"type"
+            }
+          })}}
+        {{formPage.end()}}
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" id="btn_save_page"><i class="fas fa-save"></i> Enregistrer</button>
+      </div>
+    </div>
+  </div>
+</div>

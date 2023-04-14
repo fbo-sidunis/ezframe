@@ -1,0 +1,18 @@
+{
+  "default": {
+    "dbname": "framework_sidunis",
+    "host": "localhost",
+    "port": 3306,
+    "username": "admindb",
+    "password": "1P0ss!ble",
+    "charset": "utf8"
+  },
+  "dev": {
+    "dbname": "framework_sidunis",
+    "host": "localhost",
+    "port": 3306,
+    "username": "admindb",
+    "password": "1P0ss!ble",
+    "charset": "utf8"
+  }
+}

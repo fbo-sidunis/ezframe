@@ -1,0 +1,152 @@
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex, nofollow">
+    <meta charset="UTF-8">
+    <title>ROUTES</title>
+    {% autoescape "js" %}
+      <script>
+        const ROOT_URL = "{{ ROOT_URL }}";
+        const SITE_URL = "{{ SITE_URL }}";
+        const ROUTES = JSON.parse("{{Route.getRoutes()|json_encode}}");
+        const DEBUG = {{SITE.CONFIG.DEBUG ? "true" : "false"}};
+      </script>
+    {% endautoescape %}
+    <script src="{{ ROOT_URL }}cores/common/js/functions.js"></script>
+    <script src="{{ ROOT_URL }}cores/common/js/class/Route.js"></script>
+    <script src="{{ ROOT_URL }}vendor/components/jquery/jquery.min.js"></script>
+    <script src="{{ ROOT_URL }}cores/common/js/ajax.js"></script>
+    <script src="{{ ROOT_URL }}vendor/twbs/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.18/dist/sweetalert2.all.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="{{ ROOT_URL }}vendor/twbs/bootstrap/dist/css/bootstrap.min.css">
+    <script src="https://kit.fontawesome.com/94eeb43139.js" crossorigin="anonymous"></script>
+    <link href="https://fonts.googleapis.com/css?family=Lato:100,100i,300,300i,400,400i,700,700i,900,900i" rel="stylesheet">
+    <link rel="icon" href="{{ ROOT_URL }}favicon.ico">
+    <!-- DATATABLES -->
+    <script src="{{ ROOT_URL }}libs/datatables/datatables.min.js"></script>
+    <script src="{{ ROOT_URL }}libs/datatables/Responsive-2.2.9/js/dataTables.responsive.min.js"></script>
+    <script src="{{ ROOT_URL }}libs/datatables/FixedHeader-3.1.9/js/dataTables.fixedHeader.min.js"></script>
+
+  </head>
+  <body id="p_body">
+    <div class="container-fluid">
+      <div class="col-md-12">
+        <div class="row">
+          <div class="col-md-3">
+            <button id="btn_add_route" type="button" class="btn btn-primary" > <!-- data-bs-toggle="modal" data-bs-target="#mdl_addedit_route">-->
+              <i class="fas fa-plus" style="color:white"></i>
+              Ajouter une route    
+            </button>
+          </div>
+        </div>
+        <div class="row" style="margin-right: 9%">
+          <div id="tbl_routes" class="table table-responsive-md">
+            <div class="table">
+              <table class="table table-hover table-condensed table-bordered" id="table_routes" >
+                <thead class="thead-dark">
+                  <tr>
+                    <th>URL</th>
+                    <th>Alias</th>
+                    <th>Module</th>
+                    <th>Controller</th>
+                    <th>Fonction</th>
+                    <th>Template</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody id="tbody_tbl_routes">
+                  {%  for route in routes %}
+                    <tr id="tr_{{route.alias}}">
+                      <td>{{ route.url }}</td>
+                      <td>{{ route.alias }}</td>
+                      <td>{{ route.m }}</td>
+                      <td>{{ route.c |replace({'Controller':''}) }}</td>
+                      <td>{{ route.f }}</td>
+                      <td>{{ route.t }}</td>
+                      <th>
+                        <i class="fas fa-edit edit_route" data-alias="{{ route.alias }}"></i>
+                        <i class="far fa-trash-alt delete_route" data-url="{{ route.url }}"></i>
+                      </th>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- MODALE -->
+    <div class="modal fade" id="mdl_addedit_route" tabindex="-1" role="dialog" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+
+            <h5 class="modal-title" id="mdl_title_addedit_route">Ajouter une route</h5>
+          </div>
+          <div class="modal-body">
+            <form>
+              <div class="form-group">
+                <label class="col-form-label">Alias :</label>
+                <input type="text" class="form-control" id="inp_alias">
+              </div>
+              <div class="form-group">
+                <label class="col-form-label">URL :</label>
+                <input type="text" class="form-control" id="inp_url">
+                <input type="text" class="form-control" id="inp_old_url">
+              </div>
+              <div class="form-group">
+                <label class="col-form-label">Module (App) :</label>
+                <select id="modules" class="form-control">
+                  <option value="">--</option>
+                  {% for M in modules %}
+                    <option value="{{ M|escape('html') }}">{{ M|escape('html') }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="col-form-label">Controller :</label>
+                <select id="controllers" class="form-control">
+                  <option value="">--</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="col-form-label">Fonction :</label>
+                <select id="fonctions" class="form-control">
+                  <option value="">--</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="col-form-label">Template :</label>
+                <select id="inp_template" class="form-control">
+                  <option value="">--</option>
+                  {% for T in templates %}
+                    <option value="{{ T|escape('html') }}">{{ T|escape('html') }}</option>
+                  {% endfor %}
+                </select>
+
+              </div>
+              <div class="form-group">
+                <label class="col-form-label">Fallback :</label>
+                <input type="text" class="form-control" id="inp_fallback">
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-primary" id="btn_save_route">Confirmer</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+
+    <script src="{{ ROOT_URL }}assets/js/admin/routes.js"></script>
+
+
+
+  </body><!-- comment -->
+</html>

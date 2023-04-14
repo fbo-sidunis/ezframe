@@ -1,0 +1,70 @@
+{
+  "/db/": {
+    "alias": "eztool_db",
+    "vars": {
+      "m": "EzTools",
+      "c": "Database",
+      "f": "render"
+    }
+  },
+  "/admin/routes/": {
+    "alias": "admin_routes",
+    "vars": {
+      "m": "EzTools",
+      "c": "Routes",
+      "f": "render",
+      "t": "eztools/routes.html.twig",
+      "fallback": "home"
+    }
+  },
+  "/admin/ajax_routes/getbyalias/{alias}/": {
+    "alias": "admin_ajax_get_route",
+    "vars": {
+      "m": "EzTools",
+      "c": "Routes",
+      "f": "getRouteByAlias",
+      "t": null
+    }
+  },
+  "/admin/ajax_routes/getController/": {
+    "alias": "admin_ajax_get_controller",
+    "vars": {
+      "m": "EzTools",
+      "c": "Routes",
+      "f": "getAppControllers",
+      "t": null
+    }
+  },
+  "/admin/ajax_routes/getFunctions/": {
+    "alias": "admin_ajax_get_functions",
+    "vars": {
+      "m": "EzTools",
+      "c": "Routes",
+      "f": "getControllerFunctions"
+    }
+  },
+  "/admin/ajax_routes/save/": {
+    "alias": "admin_ajax_save_route",
+    "vars": {
+      "m": "EzTools",
+      "c": "Routes",
+      "f": "ajax_saveRoute",
+      "t": null
+    }
+  },
+  "/admin/ajax_routes/delete/": {
+    "alias": "admin_ajax_delete_route",
+    "vars": {
+      "m": "EzTools",
+      "c": "Routes",
+      "f": "ajax_deleteRoute",
+      "t": null
+    }
+  },
+  "/error/path/":{
+    "alias": "path_error",
+    "vars": {
+      "p": "EzTools:Error:pathError"
+    }
+  }
+}

@@ -1,0 +1,47 @@
+<div class="modal fade" id="mdl_edit_user" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+      {% if xdebug == 2 %}
+        {% set xdtemplate = _self %}
+        {% include 'xdeb2.html.twig' %}
+      {% endif %}
+        <h5 class="modal-title">Modifier un utilisateur</h5>
+      </div>
+      <div class="modal-body">
+        <form>
+          <input type="hidden" id="userid_edit" value="">
+          <div class="form-group">
+            <label class="col-form-label">Nom :</label>
+            <input type="text" class="form-control" id="inp_name_user">
+          </div>
+          <div class="form-group">
+            <label class="col-form-label">Prénom :</label>
+            <input type="text" class="form-control" id="inp_firstname_user">
+          </div>
+          <div class="form-group">
+            <label class="col-form-label">Email :</label>
+            <input type="text" class="form-control" id="inp_email_user">
+          </div>
+          <div class="card" style="width: 18rem;">
+            <div class="card-header">
+              <label class="col-form-label">Rôles</label>
+            </div>
+            <div class="card-body">
+              {% for r in listRoles %}
+              <div class="custom-control custom-checkbox">
+                <input type="checkbox" class="custom-control-input cbx_edit_role" id="chk_edit_{{ r.code }}" value="{{ r.code }}">
+                <label class="custom-control-label" for="chk_edit_{{ r.code }}">{{ r.libelle }}</label>
+              </div>
+              {% endfor %}
+            </div>  
+          </div>  
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" id="btn_edit_user">Modifier</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+      </div>
+    </div>
+  </div>
+</div>

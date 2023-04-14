@@ -1,0 +1,31 @@
+{% extends "auth/layout_login.html.twig" %}
+
+{% block include_additional_libs %}
+  {{ style('css/login.css') }}
+  {{ script('js/login.js') }}
+{% endblock %}
+
+{% block body %}
+  <section id="login_block" class="login-form center">
+    {# Login #}
+    <form action="javascript:void(0);" id="login">
+      <h4 class="text-center mb-4">Connexion</h4>
+      <div class="form-floating">
+        <span class="underline"></span>
+        <input type="text" id="inp-login" class="form-control" autocomplete="off" placeholder="Entrez votre identifiant ..." />
+        <label for="inp-login">Identifiant</label>
+      </div>
+      <div class="form-floating mb-1">
+        <span class="underline"></span>
+        <input type="password" id="pass" class="form-control" autocomplete="off" placeholder="Entrez votre mot de passe ..." />
+        <label for="pass">Mot de passe</label>
+      </div>
+      <div class="text-end mb-4">
+        <button class="forgot-pwd btn btn-default">Mot de passe oublié ?</button>
+      </div>
+      <div class="text-center">
+        <a href="javascript:void(0);" id="btn_login" class="btn btn-primary">Se connecter</a>
+      </div>
+    </form>
+  </section>
+{% endblock %}

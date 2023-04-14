@@ -1,0 +1,18 @@
+{
+	"env": "dev"
+	,"debug": true
+	,"autodebug": false
+	,"title" : "Framework Sidunis"
+	,"core":{
+		"path": "cores/core/"
+	}
+	,"twig":{
+		"templates": "templates/"
+	},
+	"rootUrl" : "/",
+	"domain" : {
+		"dev" : "https://dev.example.com",
+		"prod" : "https://www.example.com"
+	}
+	,"expiration_session" : "+ 1 day"
+}

@@ -1,0 +1,154 @@
+{% extends "layout.html.twig" %}
+{% block header %}
+  {% include 'header.html.twig' %}
+{% endblock %}
+
+{% block body %}
+  <style>
+    input.compte{
+      margin:0px;
+      height:100%;
+      padding-left:4px;
+      border:none;
+    }
+    .disabled{
+      cursor: not-allowed;
+      background-color: lightgray;
+    }
+
+    ul.compte{
+      list-style-type: none;
+      display: inline-block;
+    }
+    ul.compte > li{
+      border:1px solid #BEC4C8;
+      border-radius: 5px;
+      display: inline-block;
+      padding:4px;
+      margin:4px;
+      font-size: 0.8em;
+    }
+
+    .material-switch > input[type="checkbox"] {
+      display: none;
+    }
+
+    .material-switch > label {
+      cursor: pointer;
+      height: 0px;
+      position: relative;
+      width: 40px;
+    }
+    .label-success{
+      background-color:lightgreen;
+    }
+    .material-switch > label::before {
+      background: rgb(0, 0, 0);
+      box-shadow: inset 0px 0px 10px rgba(0, 0, 0, 0.5);
+      border-radius: 8px;
+      content: '';
+      height: 16px;
+      margin-top: -8px;
+      position:absolute;
+      opacity: 0.3;
+      transition: all 0.4s ease-in-out;
+      width: 40px;
+    }
+    .material-switch > label::after {
+      background: rgb(255, 255, 255);
+      border-radius: 16px;
+      box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.3);
+      content: '';
+      height: 24px;
+      left: -4px;
+      margin-top: -8px;
+      position: absolute;
+      top: -4px;
+      transition: all 0.3s ease-in-out;
+      width: 24px;
+    }
+    .material-switch > input[type="checkbox"]:checked + label::before {
+      background: inherit;
+      opacity: 0.7;
+    }
+    .material-switch > input[type="checkbox"]:checked + label::after {
+      background: inherit;
+      left: 20px;
+    }
+
+
+  </style>
+  {% if xdebug == 2 %}
+    {% set xdtemplate = _self %}
+    {% include 'xdeb2.html.twig' %}
+  {% endif %}
+  <div class="col-md-12" style="padding-left: 4px;margin-top:10px;margin-left:4px;">
+    <h5>Informations du compte</h5>
+    <div class="col-md-12">
+      <table class="table table-responsive">
+        <tr>
+           <td > <span class="ttip" data-tooltip="Votre Mail">Mail</span> </td>
+          <td>
+            <input type="text" name="mail" class="form-control compte" id="mail" placeholder="Mail" required autofocus value="{{USER.COMPTE.mail}}">
+          </td>
+        </tr>
+        <tr>
+          <td > <span class="ttip" data-tooltip="Votre Nom">Nom</span> </td>
+          <td>
+            <input type="text" name="nom" class="form-control compte" id="nom" placeholder="Nom" required autofocus value="{{USER.COMPTE.nom}}">
+          </td>
+        </tr>
+        <tr>
+          <td> <span class="ttip" data-tooltip="Votre prénom">Prénom</span> </td>
+          <td>
+            <input type="text" name="prenom" class="form-control compte" id="prenom" placeholder="prenom" required value="{{USER.COMPTE.prenom}}">
+          </td>
+        </tr>
+      </table>
+    </div>
+
+
+    <h5>Divers</h5>
+    <div class="col-md-12">
+      <table class="table table-responsive ">
+        <tr>
+          <td> Rôles </td>
+          <td>
+            <ul class="compte">
+              {% for R in USER.ROLES %}
+                <li class="disabled">{{R|e}}</li>
+                {% endfor %}
+            </ul>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <div class="row" style="padding-top: 1rem">
+      <div class="col-md-3"></div>
+      <div class="col-md-6">
+        <button type="button" class="btn btn-success" onclick="saveUsr();"><i class="fa fa-sign-in"></i> Sauvegarder</button>
+      </div>
+    </div>
+    <script type="text/javascript">
+      function saveUsr() {
+        var nom = $("#nom").val();
+        var prenom = $("#prenom").val();
+        var mail = $("#mail").val();
+
+
+        var datas = {
+          nom: nom,
+          prenom: prenom,
+          mail: mail
+
+        };
+        sendFormData(Route.get("user_ajax_save"), datas, function (response) {
+          if (response.result != 1) return Swal.fire("Erreur", response.message, "error");
+          Swal.fire("OK !", "", "success");
+        });
+
+
+      }
+    </script>
+
+  {% endblock %}

@@ -38,6 +38,7 @@ class Twig{
       "DOMAIN" => DOMAIN,
       "ROOT_URL" => ROOT_URL,
       "SITE_URL" => DOMAIN . ROOT_URL,
+      "LIBRARY_URL" => LIBRARY_URL,
       "SITE_TITLE" => SITE_TITLE,
       "browser" => [
         "isMobile" => $browser->isMobile(),

@@ -85,6 +85,8 @@ class Site {
     if (!defined("SITE_TITLE")) define("SITE_TITLE",getConfig('title'));
     if (!defined("DEBUG")) define("DEBUG",getConfig('debug'));
     if (!defined("AUTODEBUG")) define("AUTODEBUG",getConfig('autodebug'));
+    if (!defined("LIBRARY_URL")) define("LIBRARY_URL","/vendor/groupefbo/ezframe/");
+    if (!defined("LIBRARY_DIR")) define("LIBRARY_DIR",ROOT_DIR."vendor/groupefbo/ezframe/");
 
     //-------------------------------------------------------------//
     // Initialisation des constantes Environnement

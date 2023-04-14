@@ -550,3 +550,25 @@ function loadClass(className,url,callback){
 		callback();
 	});
 }
+
+function loadClasses(classes,callback){
+	let classesToLoad = [];
+	foreach(classes, (url,className) => {
+		if (typeof window[className] === "undefined") {
+			classesToLoad.push(className);
+		}
+	});
+	if (classesToLoad.length === 0) {
+		return callback();
+	}
+	foreach(classes, (url,className) => {
+		if (classesToLoad.includes(className)) {
+			loadClass(className,url,() => {
+				classesToLoad = classesToLoad.filter(c => c !== className);
+				if (classesToLoad.length === 0) {
+					callback();
+				}
+			});
+		}
+	});
+}

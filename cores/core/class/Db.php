@@ -31,9 +31,9 @@ class Db {
   private $rowCount = 0;
   private $res = NULL;
   private $host = "localhost";
-  private $user = "oia";
-  private $pwd = "oiafb0//";
-  private $dbname = "oia";
+  private $user = "root";
+  private $pwd = "example_pw";
+  private $dbname = "example_db";
   private $port = "3306";
   private $charset = "utf8";
   protected static $pkey = "id";

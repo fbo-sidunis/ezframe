@@ -2,6 +2,7 @@
 namespace Core;
 
 use Core\Common\Site;
+use Core\Start\I18n;
 
 class Translator
 {
@@ -12,7 +13,6 @@ class Translator
   protected $cookieName = "locale";
   protected $cookieExpire = 3600 * 24 * 365;
   protected $cookiePath = "/";
-  protected const DEFAULT_FILE = "config/i18n.json";
 
   function __construct($translations = []){
     $this->translations = $translations;
@@ -20,11 +20,11 @@ class Translator
   }
 
   public function addToDefaultFile($key,$translation){
-    $translations = arrayFromJson(ROOT_DIR . self::DEFAULT_FILE);
+    $translations = json_decode(file_get_contents(I18n::MAIN_CONFIG_FILE),true);
     $translations[$key][$this->defaultLocale] = $translation;
     ksort($translations);
     $json = json_encode($translations, JSON_PRETTY_PRINT);
-    file_put_contents(ROOT_DIR . self::DEFAULT_FILE, $json);
+    file_put_contents(I18n::MAIN_CONFIG_FILE, $json);
   }
 
   public function getLocale(){

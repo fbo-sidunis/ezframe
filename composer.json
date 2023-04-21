@@ -1,41 +1,48 @@
 {
-  "name": "groupefbo/ezframe",
-  "type": "library",
-  "require": {
-    "twig/twig": "~3.0",
-    "cbschuld/browser.php": "~1.0",
-    "symfony/var-dumper": "~5.0",
-    "twbs/bootstrap": "~5.0",
-    "components/jquery": "~3.0",
-    "phpmailer/phpmailer": "^6.5",
-    "monolog/monolog": "^2.3",
-    "nadar/quill-delta-parser": "^3.0",
-    "symfony/dotenv": "^6.2"
-  },
-  "autoload": {
-    "psr-4": {
-      "Core\\": [
-        "cores/core/class/"
-      ],
-      "Core\\Common\\": [
-        "cores/common/class"
-      ],
-      "Helper\\": [
-        "helpers/",
-        "../../helpers/"
-      ],
-      "App\\": [
-        "app/",
-        "../../app/"
-      ]
-    },
-    "files": [
-      "helpers/functions/func_dates.php",
-      "helpers/functions/func_utils.php"
-    ]
-  },
-  "config": {
-    "optimize-autoloader": true
-  },
-  "license": "MIT"
+	"name": "groupefbo/ezframe",
+	"type": "library",
+	"require": {
+		"twig/twig": "~3.0",
+		"cbschuld/browser.php": "~1.0",
+		"symfony/var-dumper": "~5.0",
+		"twbs/bootstrap": "~5.0",
+		"components/jquery": "~3.0",
+		"phpmailer/phpmailer": "^6.5",
+		"monolog/monolog": "^2.3",
+		"nadar/quill-delta-parser": "^3.0",
+		"symfony/dotenv": "^6.2",
+		"npm-asset/twig": "^1.16"
+	},
+	"autoload": {
+		"psr-4": {
+			"Core\\": [
+				"cores/core/class/"
+			],
+			"Core\\Common\\": [
+				"cores/common/class"
+			],
+			"Helper\\": [
+				"helpers/",
+				"../../helpers/"
+			],
+			"App\\": [
+				"app/",
+				"../../app/"
+			]
+		},
+		"files": [
+			"helpers/functions/func_dates.php",
+			"helpers/functions/func_utils.php"
+		]
+	},
+	"repositories": [
+		{
+			"type": "composer",
+			"url": "https://asset-packagist.org"
+		}
+	],
+	"config": {
+		"optimize-autoloader": true
+	},
+	"license": "MIT"
 }

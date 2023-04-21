@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "141db0289389b46d7a3b2c363272d315",
+    "content-hash": "fbe5f5cd6c729f3da8dc7f32ab824c7d",
     "packages": [
         {
             "name": "cbschuld/browser.php",
@@ -259,6 +259,133 @@
                 }
             ],
             "time": "2022-06-02T06:59:00+00:00"
+        },
+        {
+            "name": "npm-asset/babel--runtime",
+            "version": "v7.21.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/babel/babel.git",
+                "reference": "202e4fa60b27d3d8de933abe113cd0a2efacd476"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/babel/babel/zipball/202e4fa60b27d3d8de933abe113cd0a2efacd476",
+                "reference": "202e4fa60b27d3d8de933abe113cd0a2efacd476"
+            },
+            "type": "npm-asset"
+        },
+        {
+            "name": "npm-asset/balanced-match",
+            "version": "1.0.2",
+            "dist": {
+                "type": "tar",
+                "url": "https://registry.npmjs.org/balanced-match/-/balanced-match-1.0.2.tgz"
+            },
+            "type": "npm-asset",
+            "license": [
+                "MIT"
+            ]
+        },
+        {
+            "name": "npm-asset/brace-expansion",
+            "version": "1.1.11",
+            "dist": {
+                "type": "tar",
+                "url": "https://registry.npmjs.org/brace-expansion/-/brace-expansion-1.1.11.tgz"
+            },
+            "require": {
+                "npm-asset/balanced-match": ">=1.0.0,<2.0.0",
+                "npm-asset/concat-map": "0.0.1"
+            },
+            "type": "npm-asset",
+            "license": [
+                "MIT"
+            ]
+        },
+        {
+            "name": "npm-asset/concat-map",
+            "version": "0.0.1",
+            "dist": {
+                "type": "tar",
+                "url": "https://registry.npmjs.org/concat-map/-/concat-map-0.0.1.tgz"
+            },
+            "type": "npm-asset",
+            "license": [
+                "MIT"
+            ]
+        },
+        {
+            "name": "npm-asset/foreachasync",
+            "version": "3.0.0",
+            "dist": {
+                "type": "tar",
+                "url": "https://registry.npmjs.org/foreachasync/-/foreachasync-3.0.0.tgz"
+            },
+            "type": "npm-asset",
+            "license": [
+                "Apache2"
+            ]
+        },
+        {
+            "name": "npm-asset/locutus",
+            "version": "2.0.16",
+            "dist": {
+                "type": "tar",
+                "url": "https://registry.npmjs.org/locutus/-/locutus-2.0.16.tgz"
+            },
+            "type": "npm-asset",
+            "license": [
+                "MIT"
+            ]
+        },
+        {
+            "name": "npm-asset/minimatch",
+            "version": "3.0.8",
+            "dist": {
+                "type": "tar",
+                "url": "https://registry.npmjs.org/minimatch/-/minimatch-3.0.8.tgz"
+            },
+            "require": {
+                "npm-asset/brace-expansion": ">=1.1.7,<2.0.0"
+            },
+            "type": "npm-asset",
+            "license": [
+                "ISC"
+            ]
+        },
+        {
+            "name": "npm-asset/twig",
+            "version": "1.16.0",
+            "dist": {
+                "type": "tar",
+                "url": "https://registry.npmjs.org/twig/-/twig-1.16.0.tgz"
+            },
+            "require": {
+                "npm-asset/babel--runtime": ">=7.8.4,<8.0.0",
+                "npm-asset/locutus": ">=2.0.11,<3.0.0",
+                "npm-asset/minimatch": "dev-3.0.x|3.0.x",
+                "npm-asset/walk": "dev-2.3.x|2.3.x"
+            },
+            "type": "npm-asset",
+            "license": [
+                "BSD-2-Clause"
+            ]
+        },
+        {
+            "name": "npm-asset/walk",
+            "version": "2.3.15",
+            "dist": {
+                "type": "tar",
+                "url": "https://registry.npmjs.org/walk/-/walk-2.3.15.tgz"
+            },
+            "require": {
+                "npm-asset/foreachasync": ">=3.0.0,<4.0.0"
+            },
+            "type": "npm-asset",
+            "license": [
+                "(MIT OR Apache-2.0)"
+            ]
         },
         {
             "name": "phpmailer/phpmailer",

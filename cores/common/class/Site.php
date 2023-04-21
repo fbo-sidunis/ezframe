@@ -12,7 +12,8 @@ use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use Symfony\Component\Dotenv\Dotenv;
 
-class Site {
+class Site
+{
 
   private static $siteConfigFilePath = 'config/site_config.json';
   /**
@@ -31,7 +32,8 @@ class Site {
    */
   private static $translator = null;
 
-  public static function getSiteConfig_(){
+  public static function getSiteConfig_()
+  {
     return [
       "TEMPLATES" => TEMPLATES,
       "ENV" => ENV,
@@ -41,29 +43,37 @@ class Site {
     ];
   }
 
-  public static function getConfigFilePath(){
+  public static function getConfigFilePath()
+  {
     return ROOT_DIR . self::$siteConfigFilePath;
   }
-  public static function getTwigEnvironnment(){
+  public static function getTwigEnvironnment()
+  {
     return self::$twigEnvironnement;
   }
-  public static function getRouting(){
+  public static function getRouting()
+  {
     return self::$routing;
   }
-  public static function getTranslator(){
+  public static function getTranslator()
+  {
     return self::$translator;
   }
-  public static function setTwigEnvironnment($twig){
+  public static function setTwigEnvironnment($twig)
+  {
     self::$twigEnvironnement = $twig;
   }
-  public static function setRouting($routing){
+  public static function setRouting($routing)
+  {
     self::$routing = $routing;
   }
-  public static function setTranslator($translator){
+  public static function setTranslator($translator)
+  {
     self::$translator = $translator;
   }
 
-  public static function init($rootDir){
+  public static function init($rootDir)
+  {
     //Démarrage des sessions :
     date_default_timezone_set("Europe/Paris");
     session_start();
@@ -78,30 +88,30 @@ class Site {
     //-------------------------------------------------------------//
     // Constantes
     //-------------------------------------------------------------//
-    if (!defined("ROOT_DIR")) define("ROOT_DIR",realpath($rootDir)."/");
-    if (!defined("APP_DIR")) define("APP_DIR",ROOT_DIR."app/");
-    if (!defined("FRAMEWORK_DIR")) define("FRAMEWORK_DIR",realpath(__DIR__."/../../../")."/");
-    if (!defined("TEMPLATES")) define("TEMPLATES",getConfig('twig.templates'));
-    if (!defined("SITEDIR")) define("SITEDIR",getConfig('siteDir'));
-    if (!defined("SITE_TITLE")) define("SITE_TITLE",getConfig('title'));
-    if (!defined("DEBUG")) define("DEBUG",getConfig('debug'));
-    if (!defined("AUTODEBUG")) define("AUTODEBUG",getConfig('autodebug'));
-    if (!defined("LIBRARY_URL")) define("LIBRARY_URL","/vendor/groupefbo/ezframe/");
-    if (!defined("LIBRARY_DIR")) define("LIBRARY_DIR",ROOT_DIR."vendor/groupefbo/ezframe/");
+    if (!defined("ROOT_DIR")) define("ROOT_DIR", realpath($rootDir) . "/");
+    if (!defined("APP_DIR")) define("APP_DIR", ROOT_DIR . "app/");
+    if (!defined("FRAMEWORK_DIR")) define("FRAMEWORK_DIR", realpath(__DIR__ . "/../../../") . "/");
+    if (!defined("TEMPLATES")) define("TEMPLATES", getConfig('twig.templates'));
+    if (!defined("SITEDIR")) define("SITEDIR", getConfig('siteDir'));
+    if (!defined("SITE_TITLE")) define("SITE_TITLE", getConfig('title'));
+    if (!defined("DEBUG")) define("DEBUG", getConfig('debug'));
+    if (!defined("AUTODEBUG")) define("AUTODEBUG", getConfig('autodebug'));
+    if (!defined("LIBRARY_URL")) define("LIBRARY_URL", "/vendor/groupefbo/ezframe/");
+    if (!defined("LIBRARY_DIR")) define("LIBRARY_DIR", ROOT_DIR . "vendor/groupefbo/ezframe/");
 
     //-------------------------------------------------------------//
     // Initialisation des constantes Environnement
     //-------------------------------------------------------------//
     $dotenv = new Dotenv();
-    $dotenv->load(ROOT_DIR.'.env');
+    $dotenv->load(ROOT_DIR . '.env');
 
-    if (!defined("ENV")) define("ENV",$_ENV['ENV'] ?? "dev");
+    if (!defined("ENV")) define("ENV", $_ENV['ENV'] ?? "dev");
 
     //-------------------------------------------------------------//
     // Error logging
     //-------------------------------------------------------------//
-    ErrorHandler::register(new Logger("error",[
-      new RotatingFileHandler(ROOT_DIR."logs/error/error.log",30),
+    ErrorHandler::register(new Logger("error", [
+      new RotatingFileHandler(ROOT_DIR . "logs/error/error.log", 30),
       new StreamHandler("php://output"),
     ]));
     //-------------------------------------------------------------//
@@ -110,7 +120,8 @@ class Site {
     self::$siteConfigFilePath = ROOT_DIR . self::$siteConfigFilePath;
   }
 
-  public static function initCli($rootDir){
+  public static function initCli($rootDir)
+  {
     self::init($rootDir);
     //-------------------------------------------------------------//
     // Initialisation des constantes manquantes
@@ -126,7 +137,8 @@ class Site {
     I18n::init();
   }
 
-  public static function initWeb($rootDir){
+  public static function initWeb($rootDir)
+  {
     self::init($rootDir);
     //-------------------------------------------------------------//
     // Initialisation des constantes manquantes
@@ -166,10 +178,8 @@ class Site {
       self::notFound($datas);
     }
     $datas['CTRL'] = [
-        'module' => $module
-        , 'controller' => $controller
-        , 'methode' => $methode,
-        'call' => '?p=' . $module . ':' . $controller . ":" . $methode
+      'module' => $module, 'controller' => $controller, 'methode' => $methode,
+      'call' => '?p=' . $module . ':' . $controller . ":" . $methode
     ];
     $objPage = new $controllerClass($datas);
     if (!method_exists($objPage, $methode)) {
@@ -188,14 +198,12 @@ class Site {
     }
   }
 
-  public static function notFound($datas) {
+  public static function notFound($datas)
+  {
     $tpl_404 = '404.html.twig';
     http_response_code(404);
     echo Site::getTwigEnvironnment()->render($tpl_404, $datas);
     exit;
   }
-//--------- FIN DE LA CLASS -----------//
+  //--------- FIN DE LA CLASS -----------//
 }
-
-
-?>

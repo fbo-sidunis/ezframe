@@ -2,3 +2,7 @@
 /vendor/
 /.vscode/
 /logs/
+.prettierrc
+package.json
+yarn.lock
+node_modules/

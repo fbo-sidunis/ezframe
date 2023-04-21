@@ -1,4 +1,5 @@
 <?php
+
 namespace Core;
 
 use Core\Common\Site;
@@ -14,71 +15,82 @@ class Translator
   protected $cookieExpire = 3600 * 24 * 365;
   protected $cookiePath = "/";
 
-  function __construct($translations = []){
+  function __construct($translations = [])
+  {
     $this->translations = $translations;
     $this->twig = Site::getTwigEnvironnment();
+    $this->retreiveLocale();
   }
 
-  public function addToDefaultFile($key,$translation){
-    $translations = json_decode(file_get_contents(I18n::MAIN_CONFIG_FILE),true);
+  public function addToDefaultFile($key, $translation)
+  {
+    $translations = json_decode(file_get_contents(I18n::MAIN_CONFIG_FILE), true);
     $translations[$key][$this->defaultLocale] = $translation;
     ksort($translations);
     $json = json_encode($translations, JSON_PRETTY_PRINT);
     file_put_contents(I18n::MAIN_CONFIG_FILE, $json);
   }
 
-  public function getLocale(){
+  public function getLocale()
+  {
     return $this->locale;
   }
 
-  public function setLocale($locale){
+  public function setLocale($locale)
+  {
     setcookie($this->cookieName, $locale, time() + $this->cookieExpire, $this->cookiePath);
     $this->locale = $locale;
   }
 
-  public function getDefaultLocale(){
+  public function getDefaultLocale()
+  {
     return $this->defaultLocale;
   }
 
-  public function getTranslations(){
+  public function getTranslations()
+  {
     return $this->translations;
   }
 
-  public function setTranslations($translations){
+  public function setTranslations($translations)
+  {
     $this->translations = $translations;
   }
 
-  public function retreiveLocale(){
+  public function retreiveLocale()
+  {
     $locale = $this->defaultLocale;
-    if(isset($_COOKIE[$this->cookieName])){
+    if (isset($_COOKIE[$this->cookieName])) {
       $locale = $_COOKIE[$this->cookieName];
     }
-    if(isset($_GET["locale"])){
+    if (isset($_GET["locale"])) {
       $locale = $_GET["locale"];
     }
     $this->locale = $locale;
     setcookie($this->cookieName, $locale, time() + $this->cookieExpire, $this->cookiePath);
   }
 
-  public function translate($key, $parameters = []){
+  public function translate($key, $parameters = [])
+  {
     $locale = $parameters["locale"] ?? $this->locale;
     $vars = $parameters["vars"] ?? [];
     $translations = $this->translations[$key] ?? [];
-    if (empty($translations)){
+    if (empty($translations)) {
       $this->addToDefaultFile($key, $key);
       $translations = $this->translations[$key] ?? [];
     }
     $translation = $translations[$locale] ?? $translations[$this->defaultLocale] ?? null;
-    $translation = $this->twig->createTemplate($translation)->render($vars);
+    $translation = $this->twig->createTemplate($translation ?? "")->render($vars);
     return $translation;
   }
 
-  public static function t($key, $parameters = []){
+  public static function t($key, $parameters = [])
+  {
     return Site::getTranslator()->translate($key, $parameters);
   }
 
-  public function addToDictionary($key, $translations){
+  public function addToDictionary($key, $translations)
+  {
     $this->translations[$key] = $translations;
   }
-
 }

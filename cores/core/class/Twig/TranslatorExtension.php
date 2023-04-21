@@ -1,4 +1,5 @@
 <?php
+
 namespace Core\Twig;
 
 use Core\Translator;
@@ -16,7 +17,7 @@ class TranslatorExtension extends AbstractExtension
       new TwigFilter('trans', [Translator::class, 't']),
     ];
   }
-  
+
   public function getFunctions()
   {
     return [];

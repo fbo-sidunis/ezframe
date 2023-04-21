@@ -10,8 +10,10 @@ use Exception;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
 
-class Twig{
-  public static function init(){
+class Twig
+{
+  public static function init()
+  {
     $templateDir = ROOT_DIR . TEMPLATES;
     try {
     } catch (Exception $e) {
@@ -34,6 +36,7 @@ class Twig{
     $browser = new Browser;
     $twigsGlobals = [
       "Route" => Site::getRouting(),
+      "Translator" => Site::getTranslator(),
       "SITE" => ["CONFIG" => Site::getSiteConfig_()],
       "DOMAIN" => DOMAIN,
       "ROOT_URL" => ROOT_URL,
@@ -45,7 +48,7 @@ class Twig{
         "isTablet" => $browser->isTablet(),
       ],
     ];
-    array_map([$twig,"addGlobal"],array_keys($twigsGlobals),$twigsGlobals);
+    array_map([$twig, "addGlobal"], array_keys($twigsGlobals), $twigsGlobals);
     $twig->addExtension(new Extension());
     $twig->addExtension(new TranslatorExtension());
     Site::setTwigEnvironnment($twig);

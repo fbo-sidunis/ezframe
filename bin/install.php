@@ -1,13 +1,13 @@
 <?php
-$install_files = realpath(__DIR__ ."/../install");
+$install_files = realpath(__DIR__ . "/../install");
 $project_path = realpath(__DIR__ . "/../../../../");
 if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
   $project_path_ = str_replace("/", "\\", $project_path);
   $install_files_ = str_replace("/", "\\", $install_files);
   shell_exec("xcopy /i /e  \"$install_files_\" \"$project_path_\" /Y");
 } else {
-  $install_files_ = $install_files."/*";
-  $project_path_ = $project_path."/";
+  $install_files_ = $install_files . "/*";
+  $project_path_ = $project_path . "/";
   shell_exec("cp -r $install_files_ $project_path_");
 }
 $composerFile = $project_path . "/composer.json";

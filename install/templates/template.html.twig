@@ -1,58 +1,30 @@
-{% extends "layout.html.twig" %}
+{% extends 'layout.html.twig' %}
 {% block body %}
-  <style>
-    html {
-      height: 100%;
-      box-sizing: border-box;
-    }
+	<style>
+		html { height: 100%; box-sizing: border-box; }
 
-    *,
-    *:before,
-    *:after {
-      box-sizing: inherit;
-    }
-    body {
-      position: relative;
-      margin: 0;
-      padding-bottom: 6rem;
-      min-height: 100%;
-      font-family: "Helvetica Neue", Arial, sans-serif;
-    }
+		*, *:before, *:after { box-sizing: inherit; } body { position: relative;
+		margin: 0; padding-bottom: 6rem; min-height: 100%; font-family: "Helvetica
+		Neue", Arial, sans-serif; }
 
-    .div-footer {
-      position: absolute;
-      right: 0;
-      bottom: 0;
-      left: 0;
-      padding: 1rem;
-      background-color: #efefef;
-      text-align: center;
-    }
+		.div-footer { position: absolute; right: 0; bottom: 0; left: 0; padding:
+		1rem; background-color: #efefef; text-align: center; }
 
-    div.a {
-      width: 80px;
-      height:80px;
-      /*background-color:red;*/
-      position:fixed;
+		div.a { width: 80px; height:80px; /*background-color:red;*/ position:fixed;
 
-    }
-    div.b {
-      width: 80px;
-      height:80px;
-      /*background-color:red;*/
-      position:fixed;
+		} div.b { width: 80px; height:80px; /*background-color:red;*/
+		position:fixed;
 
-    }
-  </style>
-  {% if xdebug == 2 %}
-    {% set xdtemplate = _self %}
-    {% include 'xdeb2.html.twig' %}
-  {% endif %}
+		}
+	</style>
+	{% if xdebug == 2 %}
+		{% set xdtemplate = _self %}
+		{% include 'xdeb2.html.twig' %}
+	{% endif %}
 
-  <script type="text/javascript">
-    $(document).ready(function () {
-      
-    });
-  </script>
+	<script type="text/javascript">
+		$(document).ready(function () {
 
+		});
+	</script>
 {% endblock %}

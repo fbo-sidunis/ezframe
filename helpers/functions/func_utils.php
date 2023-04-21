@@ -261,7 +261,7 @@ if (!function_exists("successResponse")) {
    * @param string $message [Contenu de l'argument "message" de la réponse]
    * @return false 
    */
-  function successResponse(array $datas = [],string $message = "")
+  function successResponse(array $datas = [], string $message = "")
   {
     return jsonResponse([
       "result" => 1, "message" => $message, "data" => $datas
@@ -634,7 +634,7 @@ if (!function_exists("escape_attr_js")) {
   }
 }
 
-if (!function_exists("imgToBase64")){
+if (!function_exists("imgToBase64")) {
   function imgToBase64($fileFullPath)
   {
     $type = pathinfo($fileFullPath, PATHINFO_EXTENSION);
@@ -653,18 +653,18 @@ if (!function_exists("getConfig")) {
    */
   function getConfig($configPath = null)
   {
-    if (!defined("CONFIGS")){
-      define("CONFIGS",json_decode(file_get_contents(Site::getConfigFilePath()),true));
+    if (!defined("CONFIGS")) {
+      define("CONFIGS", json_decode(file_get_contents(Site::getConfigFilePath()), true));
     }
     $config = CONFIGS;
-    if ($configPath){
-      foreach(explode(".",$configPath) as $pathPart){
-        if ($pathPart === '$ENV'){
+    if ($configPath) {
+      foreach (explode(".", $configPath) as $pathPart) {
+        if ($pathPart === '$ENV') {
           $pathPart = ENV;
         }
-        if (is_array($config)){
+        if (is_array($config)) {
           $config = $config[$pathPart] ?? null;
-        }else{
+        } else {
           return null;
         }
       }

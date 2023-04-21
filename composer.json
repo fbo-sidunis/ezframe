@@ -10,8 +10,7 @@
 		"phpmailer/phpmailer": "^6.5",
 		"monolog/monolog": "^2.3",
 		"nadar/quill-delta-parser": "^3.0",
-		"symfony/dotenv": "^6.2",
-		"npm-asset/twig": "^1.16"
+		"symfony/dotenv": "^6.2"
 	},
 	"autoload": {
 		"psr-4": {
@@ -35,12 +34,6 @@
 			"helpers/functions/func_utils.php"
 		]
 	},
-	"repositories": [
-		{
-			"type": "composer",
-			"url": "https://asset-packagist.org"
-		}
-	],
 	"config": {
 		"optimize-autoloader": true
 	},

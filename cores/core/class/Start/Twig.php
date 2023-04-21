@@ -36,7 +36,6 @@ class Twig
     $browser = new Browser;
     $twigsGlobals = [
       "Route" => Site::getRouting(),
-      "Translator" => Site::getTranslator(),
       "SITE" => ["CONFIG" => Site::getSiteConfig_()],
       "DOMAIN" => DOMAIN,
       "ROOT_URL" => ROOT_URL,

@@ -133,8 +133,8 @@ class Site
     //-------------------------------------------------------------//
     Dump::init();
     Route::initCli();
-    Twig::init();
     I18n::init();
+    Twig::init();
   }
 
   public static function initWeb($rootDir)
@@ -150,8 +150,8 @@ class Site
     //-------------------------------------------------------------//
     Dump::init();
     $routed = Route::initWeb();
-    Twig::init();
     I18n::init();
+    Twig::init();
     //-------------------------------------------------------------//
     // Variables transmises dans les templates/controller...
     //-------------------------------------------------------------//

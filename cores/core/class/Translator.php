@@ -10,7 +10,6 @@ class Translator
   protected $translations = [];
   protected $locale = "fr";
   protected $defaultLocale = "fr";
-  protected $twig = null;
   protected $cookieName = "locale";
   protected $cookieExpire = 3600 * 24 * 365;
   protected $cookiePath = "/";
@@ -18,7 +17,6 @@ class Translator
   function __construct($translations = [])
   {
     $this->translations = $translations;
-    $this->twig = Site::getTwigEnvironnment();
     $this->retreiveLocale();
   }
 
@@ -80,7 +78,7 @@ class Translator
       $translations = $this->translations[$key] ?? [];
     }
     $translation = $translations[$locale] ?? $translations[$this->defaultLocale] ?? null;
-    $translation = $this->twig->createTemplate($translation ?? "")->render($vars);
+    $translation = Site::getTwigEnvironnment()->createTemplate($translation ?? "")->render($vars);
     return $translation;
   }
 

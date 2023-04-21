@@ -3,6 +3,7 @@
 namespace Core\Common;
 
 use Core\Start\Dump;
+use Core\Start\I18n;
 use Core\Start\Route;
 use Core\Start\Twig;
 use Monolog\ErrorHandler;
@@ -121,6 +122,7 @@ class Site {
     //-------------------------------------------------------------//
     Dump::init();
     Route::initCli();
+    I18n::init();
     Twig::init();
   }
 
@@ -136,6 +138,7 @@ class Site {
     //-------------------------------------------------------------//
     Dump::init();
     $routed = Route::initWeb();
+    I18n::init();
     Twig::init();
     //-------------------------------------------------------------//
     // Variables transmises dans les templates/controller...

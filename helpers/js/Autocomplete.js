@@ -38,6 +38,10 @@ export class Autocomplete{
    * @param {number} parameters.timeout
    * @param {string} parameters.route
    * @param {Function|object} parameters.extraFilters 
+   * @param {Function|string} parameters.callbackValue
+   * @param {Function|string} parameters.callbackLabel
+   * @param {Function|string} parameters.callbackOnSelect
+   * @param {string} parameters.mode
    */
   constructor(parameters) {
     parameters = parameters ?? {};

@@ -1,10 +1,6 @@
 {# layout.html.twig #}
 <!DOCTYPE html>
 <html lang="{{ Translator.locale }}">
-	{% if xdebug == 2 %}
-		{% set xdtemplate = _self %}
-		{% include 'xdeb2.html.twig' %}
-	{% endif %}
 	{% block head %}
 		<head>
 			<meta name="viewport" content="width=device-width, initial-scale=1" />

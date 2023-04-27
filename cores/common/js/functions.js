@@ -577,6 +577,33 @@ function loadClasses(classes, callback) {
 	});
 }
 
-function t_(key) {
-	return window.TRANSLATIONS?.[window.LOCALE ?? 0]?.[key] ?? key;
+function t_(key, datas) {
+  let content = window.TRANSLATIONS?.[window.LOCALE ?? 0]?.[key] ?? key;
+  return typeof window.Twig !== "undefined"
+    ? Twig.twig({ data: content }).render(datas ?? {})
+    : content;
+}
+
+/**
+ * Traite jusqu'à 12 niveaux de profondeur
+ * @param {Object} obj1
+ * @param {Object} obj2
+ */
+function deepMerge(obj1, obj2) {
+  let obj = {};
+  foreach(obj1, (value, key) => {
+    if (typeof obj2[key] === "undefined") {
+      obj[key] = value;
+    } else if (typeof value === "object" && typeof obj2[key] === "object") {
+      obj[key] = deepMerge(value, obj2[key]);
+    } else {
+      obj[key] = obj2[key];
+    }
+  });
+  foreach(obj2, (value, key) => {
+    if (typeof obj1[key] === "undefined") {
+      obj[key] = value;
+    }
+  });
+  return obj;
 }

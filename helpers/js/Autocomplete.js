@@ -29,6 +29,10 @@ export class Autocomplete {
   _disabled = false;
   /** @type {string} */
   _mode = "datalist";
+  /** @type {object} */
+  _i18n = {
+    noResult: "Aucun résultat",
+  };
 
   /**
    * Constructeur
@@ -158,27 +162,39 @@ export class Autocomplete {
 
   updateDropdown() {
     this.clearDropdown();
-    foreach(this._choices, (choice) => {
-      let item = createElement({
-        tagName: "li",
-        children: [
-          {
-            tagName: "button",
-            attrs: {
-              type: "button",
-              className: "dropdown-item",
-              innerText: choice.label,
+    if ([...this._choices].length) {
+      [...this._choices].forEach((choice) => {
+        let item = createElement({
+          tagName: "li",
+          children: [
+            {
+              tagName: "button",
+              attrs: {
+                type: "button",
+                className: "dropdown-item",
+                innerText: choice.label,
+              },
+              // dataset : choice.dataset,
             },
-            // dataset : choice.dataset,
-          },
-        ],
+          ],
+          parent: this.dropdown,
+        });
+        item.querySelector("button").addEventListener("click", (e) => {
+          this._callbackOnSelect(choice.value, choice, this.input);
+          this.hideDropdown();
+        });
+      });
+    } else {
+      createElement({
+        tagName: "li",
+        attrs: {
+          type: "button",
+          className: "dropdown-item",
+          innerText: this.i18n.noResult,
+        },
         parent: this.dropdown,
       });
-      item.querySelector("button").addEventListener("click", (e) => {
-        this._callbackOnSelect(choice.value, choice, this.input);
-        this.hideDropdown();
-      });
-    });
+    }
   }
 
   get input() {
@@ -387,5 +403,17 @@ export class Autocomplete {
       throw "callbackOnSelect invalide";
     }
     this._callbackOnSelect = value;
+  }
+  get i18n() {
+    return this._i18n;
+  }
+  /**
+   * Remplace les valeurs par défaut, par les valeurs de l'objet passé en paramètre, si elles existent, sinon, on garde les valeurs par défaut (définies dans le constructeur)
+   * Traite les valeurs profondes
+   * @param {Object} value
+   */
+  set i18n(value) {
+    if (!(value instanceof Object)) throw "i18n invalide";
+    this._i18n = deepMerge(this._i18n, value);
   }
 }

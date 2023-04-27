@@ -305,7 +305,7 @@ export class Autocomplete {
     foreach(value, (choice) => {
       let value = !(choice instanceof Object)
         ? choice.trim()
-        : this._callbackValue(choice);
+        : (this._callbackValue(choice));
       this._choices[value] = {
         value: value,
         label: !(choice instanceof Object)
@@ -372,7 +372,7 @@ export class Autocomplete {
     return this._callbackValue;
   }
   set callbackValue(value) {
-    if (!value instanceof Function) throw "callbackValue invalide";
+    if (!(value instanceof Function)) throw "callbackValue invalide";
     this._callbackValue = value;
   }
 
@@ -380,7 +380,7 @@ export class Autocomplete {
     return this._callbackOnSelect;
   }
   set callbackOnSelect(value) {
-    if (!value instanceof Function) throw "callbackOnSelect invalide";
+    if (!(value instanceof Function)) throw "callbackOnSelect invalide";
     this._callbackOnSelect = value;
   }
 }

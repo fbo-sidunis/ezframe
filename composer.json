@@ -10,7 +10,8 @@
 		"phpmailer/phpmailer": "^6.5",
 		"monolog/monolog": "^2.3",
 		"nadar/quill-delta-parser": "^3.0",
-		"symfony/dotenv": "^6.2"
+		"symfony/dotenv": "^6.2",
+		"twig/inky-extra": "^3.5"
 	},
 	"autoload": {
 		"psr-4": {

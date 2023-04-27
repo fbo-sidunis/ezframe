@@ -5,7 +5,6 @@ namespace Core\Start;
 use Browser;
 use Core\Common\Site;
 use Core\Twig\Extension;
-use Core\Twig\TranslatorExtension;
 use Exception;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
@@ -50,7 +49,10 @@ class Twig
     ];
     array_map([$twig, "addGlobal"], array_keys($twigsGlobals), $twigsGlobals);
     $twig->addExtension(new Extension());
-    $twig->addExtension(new TranslatorExtension());
+    $extensions = getConfig("twig.extensions");
+    foreach ($extensions as $extension) {
+      $twig->addExtension(new $extension());
+    }
     Site::setTwigEnvironnment($twig);
   }
 }

@@ -6,7 +6,11 @@
     "path": "cores/core/"
   },
   "twig": {
-    "templates": "templates/"
+    "templates": "templates/",
+    "extensions": [
+      "\\Core\\Twig\\TranslatorExtension",
+      "\\Twig\\Extra\\Inky\\InkyExtension"
+    ]
   },
   "rootUrl": "/",
   "domain": {

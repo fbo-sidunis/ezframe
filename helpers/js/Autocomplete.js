@@ -162,8 +162,8 @@ export class Autocomplete {
 
   updateDropdown() {
     this.clearDropdown();
-    if ([...this._choices].length) {
-      [...this._choices].forEach((choice) => {
+    if (Object.keys(this.choices).length) {
+      foreach(this.choices, (choice) => {
         let item = createElement({
           tagName: "li",
           children: [

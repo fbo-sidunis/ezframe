@@ -308,13 +308,17 @@ class Extension extends AbstractExtension
 
   public static function addAssetPath($path)
   {
-    $path = str_replace(ROOT_DIR, "", realpath($path)) . "/";
+    $path = str_replace("\\", "/", realpath($path));
+    $rootDir = str_replace("\\", "/", ROOT_DIR);
+    $path = str_replace($rootDir, "", $path) . "/";
     self::$additionalsAssetsPaths[] = $path;
   }
 
   private static function getAssetsPaths()
   {
-    $frameworkPath = str_replace(ROOT_DIR, "", FRAMEWORK_DIR);
+    $frameworkDir = str_replace("\\", "/", FRAMEWORK_DIR);
+    $rootDir = str_replace("\\", "/", ROOT_DIR);
+    $frameworkPath = str_replace($rootDir, "", $frameworkDir);
     $fwPaths = $frameworkPath ? [$frameworkPath . self::ASSETS_PATH, $frameworkPath] : [];
     return array_merge($fwPaths, self::$additionalsAssetsPaths, [self::ASSETS_PATH, ""]);
   }

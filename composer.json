@@ -2,16 +2,16 @@
   "name": "groupefbo/ezframe",
   "type": "library",
   "require": {
-    "cbschuld/browser.php": "~1.0",
-    "components/jquery": "~3.0",
-    "monolog/monolog": "^2.3",
-    "nadar/quill-delta-parser": "^3.0",
-    "phpmailer/phpmailer": "^6.5",
-    "symfony/dotenv": "^6.2",
-    "symfony/var-dumper": "~5.0",
-    "twbs/bootstrap": "~5.0",
-    "twig/inky-extra": "^3.5",
-    "twig/twig": "~3.0"
+    "cbschuld/browser.php": "*",
+    "components/jquery": "*",
+    "monolog/monolog": "*",
+    "nadar/quill-delta-parser": "*",
+    "phpmailer/phpmailer": "*",
+    "symfony/dotenv": "*",
+    "symfony/var-dumper": "*",
+    "twbs/bootstrap": "*",
+    "twig/inky-extra": "*",
+    "twig/twig": "*"
   },
   "autoload": {
     "psr-4": {

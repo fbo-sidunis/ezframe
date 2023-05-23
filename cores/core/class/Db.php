@@ -163,7 +163,7 @@ class Db
     return $returnId ? $oDb->bdd->lastInsertId() : $oDb->res;
   }
 
-  protected static function db_exec($sql, $datas = NULL)
+  public static function db_exec($sql, $datas = NULL)
   {
     $oDb = self::getDb();
     $oDb->db_query($sql, $datas);
@@ -180,11 +180,32 @@ class Db
     return self::db_all($sql);
   }
 
-  public static function showColumns()
+  public static function showColumns($tbl = null)
   {
-    if (!static::$tbl) return null;
-    $tbl = static::$tbl;
+    $tbl = $tbl ?? static::$tbl;
+    if (!$tbl) return null;
     $sql = "DESCRIBE $tbl";
+    return self::db_all($sql);
+  }
+
+  public static function dropTable($tbl = null)
+  {
+    $tbl = $tbl ?? static::$tbl;
+    if (!$tbl) return null;
+    $sql = "DROP TABLE IF EXISTS $tbl";
+    return self::db_exec($sql);
+  }
+
+  /**
+   * Retourne les clés primaires, uniques et indexées d'une table
+   * @param mixed $tbl 
+   * @return array|false 
+   */
+  public static function showKeys($tbl = null)
+  {
+    $tbl = $tbl ?? static::$tbl;
+    if (!$tbl) return null;
+    $sql = "SHOW KEYS FROM $tbl";
     return self::db_all($sql);
   }
 

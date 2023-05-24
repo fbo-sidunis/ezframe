@@ -47,17 +47,34 @@ class Schema
 
   public function loadTables(): void
   {
+    $filesPaths = [];
     $files = assetsMap(self::MAIN_FOLDER, 1);
-    //Pour tous les fichiers .json, on crée une table et ses colonnes
     foreach ($files as $file) {
-      if (pathinfo($file, PATHINFO_EXTENSION) !== "json") continue;
-      $content = $this->getContent(self::MAIN_FOLDER . $file);
+      $filePath = self::MAIN_FOLDER . $file;
+      if (pathinfo($filePath, PATHINFO_EXTENSION) !== "json") continue;
+      $filesPaths[basename($filePath, ".json")] = $filePath;
+    }
+    $modulesFolders = assetsMap(ROOT_DIR . "app/", 3);
+    foreach ($modulesFolders as $moduleName => $modulesFolder) {
+      if (!is_array($modulesFolder)) continue;
+      $schemaFolder = $modulesFolder["schema"] ?? null;
+      if (!$schemaFolder) continue;
+      foreach ($schemaFolder as $file) {
+        $filePath = ROOT_DIR . "app/" . $moduleName . "/schema/" . $file;
+        if (pathinfo($filePath, PATHINFO_EXTENSION) !== "json") continue;
+        $filesPaths[basename($filePath, ".json")] = $filePath;
+      }
+    }
+
+    //Pour tous les fichiers .json, on crée une table et ses colonnes
+    foreach ($filesPaths as $filePath) {
+      $content = $this->getContent($filePath);
       try {
         $table = Table::createFromArray($content);
-        if (basename($file, ".json") !== $table->getName()) throw new Exception("Le nom de la table `" . $table->getName() . "` ne correspond pas au nom du fichier `$file`");
+        if (basename($filePath, ".json") !== $table->getName()) throw new Exception("Le nom de la table `" . $table->getName() . "` ne correspond pas au nom du fichier `$file`");
         $this->addTable($table->getName(), $table);
       } catch (\Exception $e) {
-        throw new Exception("Erreur lors de la création de la table du fichier $file : " . $e->getMessage());
+        throw new Exception("Erreur lors de la création de la table du fichier $filePath : " . $e->getMessage());
       }
     }
   }

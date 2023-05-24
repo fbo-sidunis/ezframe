@@ -49,8 +49,9 @@ class Colonne
   ];
   protected string $_name;
   protected string $_type;
-  protected ?int $_length = null;
+  protected ?string $_length = null;
   protected mixed $_default = null;
+  protected mixed $_onUpdate = null;
   protected ?string $_comment = null;
   protected bool $_null = false;
   protected bool $_autoIncrement = false;
@@ -68,6 +69,7 @@ class Colonne
     string $type,
     ?int $length = null,
     mixed $default = null,
+    mixed $onUpdate = null,
     ?string $comment = null,
     bool $null = false,
     bool $autoIncrement = false,
@@ -90,6 +92,7 @@ class Colonne
     $this->_type = $type;
     $this->_length = $length;
     $this->_default = $default;
+    $this->_onUpdate = $onUpdate;
     $this->_comment = $comment;
     $this->_null = $null;
     $this->_autoIncrement = $autoIncrement;
@@ -151,6 +154,34 @@ class Colonne
       return $this->getDefault() ? 'TRUE' : 'FALSE';
     }
     return "'{$this->getDefault()}'";
+  }
+
+  public function getOnUpdate(): mixed
+  {
+    return $this->_onUpdate;
+  }
+
+  public function getQuotedOnUpdate(): mixed
+  {
+    if ($this->getOnUpdate() === null) {
+      return 'NULL';
+    }
+    if (in_array($this->getType(), self::NUMERIC_TYPES)) {
+      return $this->getOnUpdate();
+    }
+    if (in_array($this->getType(), self::STRING_TYPES)) {
+      return "'{$this->getOnUpdate()}'";
+    }
+    if (in_array($this->getType(), self::DATE_TYPES)) {
+      if ($this->getOnUpdate() === 'CURRENT_TIMESTAMP') {
+        return $this->getOnUpdate();
+      }
+      return "'{$this->getOnUpdate()}'";
+    }
+    if (in_array($this->getType(), self::BOOLEAN_TYPES)) {
+      return $this->getOnUpdate() ? 'TRUE' : 'FALSE';
+    }
+    return "'{$this->getOnUpdate()}'";
   }
 
   public function getComment(): ?string
@@ -227,7 +258,12 @@ class Colonne
     if ($this->isAutoIncrement()) {
       $elements[] = 'AUTO_INCREMENT';
     } else {
-      $elements[] = "DEFAULT {$this->getQuotedDefault()}";
+      if ($this->getDefault() !== null || $this->isNull()) {
+        $elements[] = "DEFAULT {$this->getQuotedDefault()}";
+      }
+    }
+    if ($this->getOnUpdate() !== null) {
+      $elements[] = "ON UPDATE {$this->getQuotedOnUpdate()}";
     }
     if ($this->isNull()) {
       $elements[] = 'NULL';
@@ -286,35 +322,37 @@ class Colonne
   {
     return new Colonne(
       /*name*/
-      $column["name"] ?? null,
+      $parameters["name"] ?? null,
       /*type*/
-      $column["type"] ?? null,
+      $parameters["type"] ?? null,
       /*length*/
-      $column["length"] ?? null,
+      $parameters["length"] ?? null,
       /*default*/
-      $column["default"] ?? null,
+      $parameters["default"] ?? null,
+      /*onUpdate*/
+      $parameters["onUpdate"] ?? null,
       /*comment*/
-      $column["comment"] ?? null,
+      $parameters["comment"] ?? null,
       /*null*/
-      $column["null"] ?? null,
+      $parameters["null"] ?? null,
       /*autoIncrement*/
-      $column["autoIncrement"] ?? null,
+      $parameters["autoIncrement"] ?? null,
       /*primary*/
-      $column["primary"] ?? null,
+      $parameters["primary"] ?? null,
       /*unique*/
-      $column["unique"] ?? null,
+      $parameters["unique"] ?? null,
       /*index*/
-      $column["index"] ?? null,
+      $parameters["index"] ?? null,
       /*unsigned*/
-      $column["unsigned"] ?? null,
+      $parameters["unsigned"] ?? null,
       /*referenceColumn*/
-      $column["referenceColumn"] ?? null,
+      $parameters["referenceColumn"] ?? null,
       /*referenceTable*/
-      $column["referenceTable"] ?? null,
+      $parameters["referenceTable"] ?? null,
       /*cascadeOnDelete*/
-      $column["cascadeOnDelete"] ?? null,
+      $parameters["cascadeOnDelete"] ?? null,
       /*cascadeOnUpdate*/
-      $column["cascadeOnUpdate"] ?? null,
+      $parameters["cascadeOnUpdate"] ?? null,
     );
   }
 }

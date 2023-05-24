@@ -1,0 +1,78 @@
+{
+  "name" : "user",
+  "columns" : [
+    {
+      "name" : "id",
+      "type" : "BIGINT",
+      "autoIncrement" : true,
+      "primary" : true,
+      "null" : false,
+      "unsigned" : true,
+      "comment" : "Identifiant de l'utilisateur"
+    },
+    {
+      "name" : "actif",
+      "type" : "ENUM",
+      "length" : "'Y','N'",
+      "default" : "'Y'",
+      "null" : false,
+      "comment" : "Utilisateur actif"
+    },
+    {
+      "name" : "nom",
+      "type" : "VARCHAR",
+      "length" : 50,
+      "null" : false,
+      "comment" : "Nom de l'utilisateur"
+    },
+    {
+      "name" : "prenom",
+      "type" : "VARCHAR",
+      "length" : 50,
+      "null" : false,
+      "comment" : "Prénom de l'utilisateur"
+    },
+    {
+      "name" : "mail",
+      "type" : "VARCHAR",
+      "length" : 256,
+      "null" : false,
+      "comment" : "Email de l'utilisateur"
+    },
+    {
+      "name" : "pass",
+      "type" : "VARCHAR",
+      "length" : 256,
+      "null" : false,
+      "comment" : "Mot de passe de l'utilisateur"
+    },
+    {
+      "name" : "date_creation",
+      "type" : "DATETIME",
+      "null" : false,
+      "comment" : "Date de création de l'utilisateur",
+      "default" : "CURRENT_TIMESTAMP"
+    },
+    {
+      "name" : "date_modification",
+      "type" : "DATETIME",
+      "null" : false,
+      "comment" : "Date de modification de l'utilisateur",
+      "default" : "CURRENT_TIMESTAMP",
+      "onUpdate" : "CURRENT_TIMESTAMP"
+    },
+    {
+      "name" : "lastcnx",
+      "type" : "DATETIME",
+      "null" : true,
+      "comment" : "Date de dernière connexion de l'utilisateur"
+    },
+    {
+      "name" : "roles",
+      "type" : "JSON",
+      "null" : true,
+      "comment" : "Roles de l'utilisateur sous forme de tableau JSON"
+    }
+  ],
+  "comment" : "Table des utilisateurs"
+}

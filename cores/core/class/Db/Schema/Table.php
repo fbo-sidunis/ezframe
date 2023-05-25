@@ -1,6 +1,6 @@
 <?php
 
-namespace Db\Schema;
+namespace Core\Db\Schema;
 
 use Core\Db;
 
@@ -16,24 +16,24 @@ class Table
   protected string $_name;
   protected array $_columns = [];
   protected ?string $_comment = null;
-  protected string $_engine = "InnoDB";
-  protected string $_charset = "utf8mb4";
-  protected string $_collation = "utf8mb4_unicode_ci";
+  protected ?string $_engine = "InnoDB";
+  protected ?string $_charset = "utf8mb4";
+  protected ?string $_collation = "utf8mb4_unicode_ci";
 
   public function __construct(
     string $name,
     array $columns = [],
     ?string $comment = null,
-    string $engine = "InnoDB",
-    string $charset = "utf8mb4",
-    string $collation = "utf8mb4_unicode_ci"
+    ?string $engine = "InnoDB",
+    ?string $charset = "utf8mb4",
+    ?string $collation = "utf8mb4_unicode_ci"
   ) {
     $this->_name = $name;
     $this->_columns = $columns;
     $this->_comment = $comment;
-    $this->_engine = $engine;
-    $this->_charset = $charset;
-    $this->_collation = $collation;
+    $this->_engine = $engine ?? "InnoDB";
+    $this->_charset = $charset ?? "utf8mb4";
+    $this->_collation = $collation ?? $this->_charset . "_unicode_ci";
   }
 
   /**
@@ -62,6 +62,15 @@ class Table
   public function getComment(): ?string
   {
     return $this->_comment;
+  }
+
+  public function getQuotedComment(): ?string
+  {
+    if ($this->_comment === null) {
+      return null;
+    }
+    $comment = str_replace("'", "\\'", $this->_comment);
+    return "'{$comment}'";
   }
 
   public function getEngine(): string
@@ -144,11 +153,7 @@ class Table
   public function isTableInDb()
   {
     $tables = Db::showTables();
-    foreach ($tables as $table) {
-      if ($table === $this->_name) {
-        return true;
-      }
-    }
+    return in_array($this->_name, $tables);
   }
 
   public function getColumnsInDb()
@@ -188,8 +193,12 @@ class Table
       $elements[] = "  " . $colonne;
     }
     $elementsCreate[] = implode(",\n", $elements);
-    $elementsCreate[] = ") ENGINE=" . $table->getEngine() . " DEFAULT CHARSET=" . $table->getCharset() . " COLLATE=" . $table->getCollation() . " COMMENT='" . $table->getComment() . "';";
-    return Db::db_exec(implode("\n", $elementsCreate));
+    $elementsCreate[] = ")";
+    $elementsCreate[] = "ENGINE=" . $table->getEngine();
+    $elementsCreate[] = "DEFAULT CHARSET=" . $table->getCharset();
+    $elementsCreate[] = "COLLATE=" . $table->getCollation();
+    if ($table->getComment() !== null) $elementsCreate[] = "COMMENT={$table->getQuotedComment()}";
+    return Db::db_exec(implode("\n", $elementsCreate) . ";");
   }
 
   public function create()
@@ -213,13 +222,13 @@ class Table
     $primaryKeysNameInTable = array_map(fn ($colonne) => $colonne->getName(), $primaryKeysInTable);
     $primaryKeysToDrop = array_filter($primaryKeysInDb, fn ($key) => !in_array($key["Column_name"], $primaryKeysNameInTable));
     $primaryKeysToAdd = array_filter($primaryKeysInTable, fn ($colonne) => !in_array($colonne->getName(), $primaryKeysNameInDb));
-    $uniqueKeysInDb = array_filter($keysInDb, fn ($key) => $key["Key_name"] !== "PRIMARY" && $key["Non_unique"] === "0");
+    $uniqueKeysInDb = array_filter($keysInDb, fn ($key) => $key["Key_name"] !== "PRIMARY" && $key["Non_unique"] == 0);
     $uniqueKeysInTable = array_filter($columnsInTable, fn ($colonne) => $colonne->isUnique());
     $uniqueKeysNameInDb = array_map(fn ($key) => $key["Column_name"], $uniqueKeysInDb);
     $uniqueKeysNameInTable = array_map(fn ($colonne) => $colonne->getName(), $uniqueKeysInTable);
     $uniqueKeysToDrop = array_filter($uniqueKeysInDb, fn ($key) => !in_array($key["Column_name"], $uniqueKeysNameInTable));
     $uniqueKeysToAdd = array_filter($uniqueKeysInTable, fn ($colonne) => !in_array($colonne->getName(), $uniqueKeysNameInDb));
-    $indexKeysInDb = array_filter($keysInDb, fn ($key) => $key["Key_name"] !== "PRIMARY" && $key["Non_unique"] === "1");
+    $indexKeysInDb = array_filter($keysInDb, fn ($key) => $key["Key_name"] !== "PRIMARY" && $key["Non_unique"] == 1);
     $indexKeysInTable = array_filter($columnsInTable, fn ($colonne) => $colonne->isIndex());
     $indexKeysNameInDb = array_map(fn ($key) => $key["Column_name"], $indexKeysInDb);
     $indexKeysNameInTable = array_map(fn ($colonne) => $colonne->getName(), $indexKeysInTable);
@@ -241,10 +250,10 @@ class Table
       $elements[] = "  DROP COLUMN " . $column["Field"];
     }
     foreach ($columnsToAdd as $key => $column) {
-      $elements[] = "  ADD " . $column->getColumnLine();
+      $elements[] = "  ADD " . $column->getColumnLine() . " " . $column->getAfterLine();
     }
     foreach ($columnsToModify as $key => $column) {
-      $elements[] = "  MODIFY " . $column->getColumnLine();
+      $elements[] = "  MODIFY " . $column->getColumnLine() . " " . $column->getAfterLine();
     }
     foreach ($primaryKeysToAdd as $key => $column) {
       $elements[] = "  ADD " . $column->getPrimaryLine();
@@ -271,7 +280,17 @@ class Table
 
   public static function createFromArray(array $table)
   {
-    $columns = array_map(fn ($colonne) => Colonne::createFromArray($colonne), $table["columns"] ?? []);
+    $columns = [];
+    // array_map(fn ($colonne) => Colonne::createFromArray($colonne), $table["columns"] ?? []);
+    $previousColumn = null;
+    foreach ($table["columns"] ?? [] as $key => $columnData) {
+      $column = Colonne::createFromArray($columnData);
+      if ($previousColumn !== null) {
+        $column->setPreviousColumn($previousColumn);
+      }
+      $columns[] = $column;
+      $previousColumn = $column;
+    }
     return new Table(
       $table["name"] ?? null,
       $columns,

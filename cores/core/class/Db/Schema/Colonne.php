@@ -1,6 +1,6 @@
 <?php
 
-namespace Db\Schema;
+namespace Core\Db\Schema;
 
 /**
  * Class Colonne, symbolise une colonne d'une table
@@ -49,7 +49,7 @@ class Colonne
   ];
   protected string $_name;
   protected string $_type;
-  protected ?string $_length = null;
+  protected mixed $_length = null;
   protected mixed $_default = null;
   protected mixed $_onUpdate = null;
   protected ?string $_comment = null;
@@ -63,11 +63,12 @@ class Colonne
   protected ?string $_referenceTable = null;
   protected bool $_cascadeOnDelete = false;
   protected bool $_cascadeOnUpdate = false;
+  protected ?Colonne $_previousColumn = null;
 
   public function __construct(
     string $name,
     string $type,
-    ?int $length = null,
+    mixed $length = null,
     mixed $default = null,
     mixed $onUpdate = null,
     ?string $comment = null,
@@ -123,7 +124,7 @@ class Colonne
     return $this->_type;
   }
 
-  public function getLength(): ?int
+  public function getLength(): mixed
   {
     return $this->_length;
   }
@@ -189,6 +190,15 @@ class Colonne
     return $this->_comment;
   }
 
+  public function getQuotedComment(): ?string
+  {
+    if ($this->_comment === null) {
+      return null;
+    }
+    $comment = str_replace("'", "\\'", $this->_comment);
+    return "'{$comment}'";
+  }
+
   public function isNull(): bool
   {
     return $this->_null;
@@ -233,6 +243,10 @@ class Colonne
   {
     return $this->_referenceTable;
   }
+  public function getQuotedReferenceTable(): ?string
+  {
+    return "`{$this->_referenceTable}`";
+  }
 
   public function isCascadeOnDelete(): bool
   {
@@ -244,6 +258,18 @@ class Colonne
     return $this->_cascadeOnUpdate;
   }
 
+  public function getPreviousColumn(): ?Colonne
+  {
+    return $this->_previousColumn;
+  }
+
+  public function setPreviousColumn(?Colonne $previousColumn): self
+  {
+    $this->_previousColumn = $previousColumn;
+    return $this;
+  }
+
+
   /** -------------------- */
 
 
@@ -251,7 +277,7 @@ class Colonne
   {
     $elements = [];
     $elements[] = $this->getQuotedName();
-    $elements[] = $this->getType() . ($this->getLength() !== null ? "({$this->getLength()})" : '');
+    $elements[] = $this->getType() . ($this->getLength() !== null ? ("(" . $this->getLength() . ")") : '');
     if ($this->isUnsigned()) {
       $elements[] = 'UNSIGNED';
     }
@@ -271,20 +297,28 @@ class Colonne
       $elements[] = 'NOT NULL';
     }
     if ($this->getComment() !== null) {
-      $elements[] = "COMMENT '{$this->getComment()}'";
+      $elements[] = "COMMENT {$this->getQuotedComment()}";
     }
 
     return implode(' ', $elements);
   }
 
-  public function getForeignKeyLine(): string
+  public function getAfterLine(): ?string
+  {
+    if (!$this->getPreviousColumn()) {
+      return "FIRST";
+    }
+    return "AFTER {$this->getPreviousColumn()->getQuotedName()}";
+  }
+
+  public function getForeignKeyLine(): ?string
   {
     if (!$this->getReferenceColumn() || !$this->getReferenceTable()) {
       return null;
     }
     $elements = [];
     $elements[] = "FOREIGN KEY ({$this->getQuotedName()})";
-    $elements[] = "REFERENCES {$this->getReferenceTable()}({$this->getQuotedReferenceColumn()})";
+    $elements[] = "REFERENCES {$this->getQuotedReferenceTable()}({$this->getQuotedReferenceColumn()})";
     if ($this->isCascadeOnDelete()) {
       $elements[] = 'ON DELETE CASCADE';
     }
@@ -294,7 +328,7 @@ class Colonne
     return implode(' ', $elements);
   }
 
-  public function getIndexLine(): string
+  public function getIndexLine(): ?string
   {
     if (!$this->isIndex()) {
       return null;
@@ -302,7 +336,7 @@ class Colonne
     return "INDEX ({$this->getQuotedName()})";
   }
 
-  public function getUniqueLine(): string
+  public function getUniqueLine(): ?string
   {
     if (!$this->isUnique()) {
       return null;
@@ -310,7 +344,7 @@ class Colonne
     return "UNIQUE ({$this->getQuotedName()})";
   }
 
-  public function getPrimaryLine(): string
+  public function getPrimaryLine(): ?string
   {
     if (!$this->isPrimary()) {
       return null;
@@ -334,25 +368,25 @@ class Colonne
       /*comment*/
       $parameters["comment"] ?? null,
       /*null*/
-      $parameters["null"] ?? null,
+      $parameters["null"] ?? false,
       /*autoIncrement*/
-      $parameters["autoIncrement"] ?? null,
+      $parameters["autoIncrement"] ?? false,
       /*primary*/
-      $parameters["primary"] ?? null,
+      $parameters["primary"] ?? false,
       /*unique*/
-      $parameters["unique"] ?? null,
+      $parameters["unique"] ?? false,
       /*index*/
-      $parameters["index"] ?? null,
+      $parameters["index"] ?? false,
       /*unsigned*/
-      $parameters["unsigned"] ?? null,
+      $parameters["unsigned"] ?? false,
       /*referenceColumn*/
       $parameters["referenceColumn"] ?? null,
       /*referenceTable*/
       $parameters["referenceTable"] ?? null,
       /*cascadeOnDelete*/
-      $parameters["cascadeOnDelete"] ?? null,
+      $parameters["cascadeOnDelete"] ?? false,
       /*cascadeOnUpdate*/
-      $parameters["cascadeOnUpdate"] ?? null,
+      $parameters["cascadeOnUpdate"] ?? false,
     );
   }
 }

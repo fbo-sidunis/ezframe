@@ -19,7 +19,7 @@
 
 namespace Core;
 
-use Exception;
+use Core\Exception;
 use Monolog\Logger;
 use PDO;
 use PDOException;
@@ -81,8 +81,7 @@ class Db
       // mode de fetch par défaut : FETCH_ASSOC / FETCH_OBJ / FETCH_BOTH
       $bdd->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
     } catch (PDOException $e) {
-      echo "<br>dsn : $dsn";
-      die('Erreur : ' . $e->getMessage());
+      throw new Exception("Erreur lors de la connexion à la base de données : " . $e->getMessage());
     }
     $this->bdd = $bdd;
   }
@@ -104,13 +103,11 @@ class Db
         new \Monolog\Handler\RotatingFileHandler(ROOT_DIR . "logs/db/db.log", Logger::ERROR, 30)
       ]);
       // en cas d'erreur :
-      $logger->error($e->getMessage());
-      $logger->error("Requête : " . $sql, $datas ?: []);
-      echo "<br><b>Erreur ! " . $e->getMessage() . "</b>" . PHP_EOL;
-      echo "<pre> La requete :" . $sql . "</pre>" . PHP_EOL;
-      echo " <pre>Les datas : " . PHP_EOL;
-      print_r($datas);
-      echo "</pre>" . PHP_EOL;
+      $logger->error($e->getMessage(), [
+        "sql" => str_replace(PHP_EOL, " ", $sql),
+        "datas" => $datas
+      ]);
+      throw new Exception("Erreur lors de la requête :" . PHP_EOL . $sql . PHP_EOL . $e->getMessage());
     }
   }
 
@@ -146,9 +143,7 @@ class Db
       $oDb->db_query($sql, $datas);
       return $oDb->prepare->fetch($fetchmode);
     } catch (\Exception $e) {
-      echo "Erreur " . $e->getMessage();
-      echo "<br> SQL :" . $sql;
-      echo "<br> datas :" . print_r($datas, true);
+      throw new Exception("Erreur lors de la requête :" . PHP_EOL . $sql . PHP_EOL . $e->getMessage());
     }
   }
   protected static function db_one_col($sql, $datas = NULL)
@@ -177,7 +172,7 @@ class Db
   public static function showTables()
   {
     $sql = "show tables;";
-    return self::db_all($sql);
+    return self::db_all($sql, null, PDO::FETCH_COLUMN);
   }
 
   public static function showColumns($tbl = null)

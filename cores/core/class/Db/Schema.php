@@ -2,8 +2,8 @@
 
 namespace Core\Db;
 
-use Db\Schema\Colonne;
-use Db\Schema\Table;
+use Core\Db\Schema\Colonne;
+use Core\Db\Schema\Table;
 use Exception;
 
 class Schema
@@ -18,6 +18,7 @@ class Schema
 
   /**
    * Get the value of tables
+   * @return Table[]
    */
   public function getTables(): array
   {

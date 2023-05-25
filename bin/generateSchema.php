@@ -2,6 +2,7 @@
 
 use Core\Common\Site;
 use Core\Db\Schema;
+use Core\Exception;
 
 require __DIR__ . "/../../../autoload.php";
 

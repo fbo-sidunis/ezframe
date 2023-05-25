@@ -162,6 +162,21 @@ class Table
     return $columns;
   }
 
+  /**
+   * Retourne une colonne de la table
+   * @param mixed $name 
+   * @return Colonne|null 
+   */
+  public function getColumnByName($name)
+  {
+    foreach ($this->_columns as $key => $colonne) {
+      if ($colonne->getName() === $name) {
+        return $colonne;
+      }
+    }
+    return null;
+  }
+
   public function getKeysInDb()
   {
     $keys = Db::showKeys($this->_name);
@@ -241,9 +256,13 @@ class Table
       $elements[] = "  DROP PRIMARY KEY";
     }
     foreach ($uniqueKeysToDrop as $key => $column) {
+      if ($this->getColumnByName($column["Column_name"])->getReferenceColumn() !== null) {
+        $elements[] = "  ADD " . $this->getColumnByName($column["Column_name"])->getIndexLine(true);
+      }
       $elements[] = "  DROP INDEX " . $column["Key_name"];
     }
     foreach ($indexKeysToDrop as $key => $column) {
+      if ($this->getColumnByName($column["Column_name"])->getReferenceColumn() !== null) continue;
       $elements[] = "  DROP INDEX " . $column["Key_name"];
     }
     foreach ($columnsToDrop as $key => $column) {

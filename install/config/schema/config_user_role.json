@@ -1,0 +1,45 @@
+{
+  "name": "config_user_role",
+  "columns": [
+    {
+      "name": "id",
+      "type": "BIGINT",
+      "autoIncrement": true,
+      "primary": true,
+      "null": false,
+      "comment": "Identifiant de la configuration utilisateur"
+    },
+    {
+      "name": "id_user",
+      "type": "BIGINT",
+      "comment": "Identifiant de l'utilisateur",
+      "unsigned": true,
+      "referenceColumn": "id",
+      "referenceTable": "user"
+    },
+    {
+      "name": "role",
+      "type": "VARCHAR",
+      "length": 50,
+      "null": true,
+      "comment": "Rôle de l'utilisateur",
+      "index": true
+    },
+    {
+      "name": "lastupdate_date",
+      "type": "TIMESTAMP",
+      "null": true,
+      "default": "CURRENT_TIMESTAMP",
+      "onUpdate": "CURRENT_TIMESTAMP",
+      "comment": "Date de la dernière mise à jour"
+    },
+    {
+      "name": "lastupdate_by",
+      "type": "BIGINT",
+      "length": 20,
+      "null": true,
+      "comment": "Identifiant de l'utilisateur ayant effectué la dernière mise à jour"
+    }
+  ],
+  "comment": "Table de configuration des rôles utilisateur"
+}

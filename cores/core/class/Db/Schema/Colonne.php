@@ -328,9 +328,9 @@ class Colonne
     return implode(' ', $elements);
   }
 
-  public function getIndexLine(): ?string
+  public function getIndexLine($force = false): ?string
   {
-    if (!$this->isIndex()) {
+    if (!$this->isIndex() && !$force) {
       return null;
     }
     return "INDEX ({$this->getQuotedName()})";

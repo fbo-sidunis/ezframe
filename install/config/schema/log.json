@@ -1,0 +1,50 @@
+{
+  "name": "log",
+  "columns": [
+    {
+      "name": "id",
+      "type": "INT",
+      "length": 11,
+      "autoIncrement": true,
+      "primary": true,
+      "null": false,
+      "comment": "Identifiant de la log"
+    },
+    {
+      "name": "date",
+      "type": "TIMESTAMP",
+      "null": false,
+      "default": "CURRENT_TIMESTAMP",
+      "onUpdate": "CURRENT_TIMESTAMP",
+      "comment": "Date de la log"
+    },
+    {
+      "name": "title",
+      "type": "VARCHAR",
+      "length": 64,
+      "null": false,
+      "comment": "Titre de la log"
+    },
+    {
+      "name": "txt",
+      "type": "LONGTEXT",
+      "null": false,
+      "comment": "Texte de la log"
+    },
+    {
+      "name": "type",
+      "type": "VARCHAR",
+      "length": 32,
+      "null": true,
+      "comment": "Type de la log"
+    },
+    {
+      "name": "sess",
+      "type": "VARCHAR",
+      "length": 64,
+      "null": true,
+      "comment": "Session de la log"
+    }
+  ],
+  "comment": "Table des logs"
+}

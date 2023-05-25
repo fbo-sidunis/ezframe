@@ -1,0 +1,47 @@
+{
+  "name": "config_role",
+  "columns": [
+    {
+      "name": "code",
+      "type": "VARCHAR",
+      "length": 32,
+      "null": false,
+      "comment": "Code du rôle",
+      "index": true
+    },
+    {
+      "name": "libelle",
+      "type": "VARCHAR",
+      "length": 50,
+      "null": true,
+      "comment": "Libellé du rôle"
+    },
+    {
+      "name": "defaut",
+      "type": "ENUM",
+      "values": [
+        "Y",
+        "N"
+      ],
+      "null": true,
+      "comment": "Rôle par défaut"
+    },
+    {
+      "name": "actif",
+      "type": "ENUM",
+      "values": [
+        "Y",
+        "N"
+      ],
+      "null": true,
+      "comment": "Rôle actif",
+      "index": true
+    }
+  ],
+  "indexes": [
+    {
+      "name": "actif"
+    }
+  ],
+  "comment": "Table des associations des rôles utilisateur"
+}

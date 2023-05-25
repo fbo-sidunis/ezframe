@@ -1,0 +1,38 @@
+{
+  "name": "sessions",
+  "columns": [
+    {
+      "name": "id",
+      "type": "BIGINT",
+      "autoIncrement": true,
+      "primary": true,
+      "null": false,
+      "unsigned": true,
+      "comment": "Identifiant de la session"
+    },
+    {
+      "name": "id_user",
+      "type": "BIGINT",
+      "null": false,
+      "unsigned": true,
+      "comment": "Identifiant de l'utilisateur",
+      "referenceTable": "user",
+      "referenceColumn": "id"
+    },
+    {
+      "name": "token",
+      "type": "VARCHAR",
+      "length": 128,
+      "null": false,
+      "unique": true,
+      "comment": "Token de la session"
+    },
+    {
+      "name": "expiration",
+      "type": "DATETIME",
+      "null": false,
+      "comment": "Date d'expiration de la session"
+    }
+  ],
+  "comment": "Table des sessions utilisateurs"
+}

@@ -14,7 +14,7 @@ try {
   $schema->generate();
 } catch (Exception $e) {
   echo "Erreur lors de la génération du schéma : " . $e->getMessage() . PHP_EOL;
-  exit(1);
+  dd($e->getData());
 }
 
 echo "Génération du schéma terminée" . PHP_EOL;

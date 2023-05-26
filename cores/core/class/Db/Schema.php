@@ -82,7 +82,20 @@ class Schema
 
   public function generate(): void
   {
-    foreach ($this->getTables() as $table) {
+    $tables = $this->getTables();
+    //We order the tables by dependencies, so that the foreign keys are created after the tables they depend on
+    usort($tables, function (Table $a, Table $b) {
+      $aDeps = $a->getDependencies();
+      if (empty($aDeps)) return -1;
+      $bDeps = $b->getDependencies();
+      if (empty($bDeps)) return 1;
+      $aName = $a->getName();
+      $bName = $b->getName();
+      if (in_array($aName, $bDeps)) return -1;
+      if (in_array($bName, $aDeps)) return 1;
+      return 0;
+    });
+    foreach ($tables as $table) {
       $table->update();
     }
   }

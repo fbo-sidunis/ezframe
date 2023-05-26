@@ -2,6 +2,8 @@
 
 namespace Core\Db\Schema;
 
+use Core\Exception;
+
 /**
  * Class Colonne, symbolise une colonne d'une table
  * Devra pouvoir mettre à jour la colonne en base
@@ -64,6 +66,8 @@ class Colonne
   protected bool $_cascadeOnDelete = false;
   protected bool $_cascadeOnUpdate = false;
   protected ?Colonne $_previousColumn = null;
+  protected ?array $_enumValues = null;
+  protected ?Table $_table = null;
 
   public function __construct(
     string $name,
@@ -81,14 +85,19 @@ class Colonne
     ?string $referenceColumn = null,
     ?string $referenceTable = null,
     bool $cascadeOnDelete = false,
-    bool $cascadeOnUpdate = false
+    bool $cascadeOnUpdate = false,
+    ?array $enumValues = null,
+    ?Table $table = null
   ) {
     if (empty($name)) {
-      throw new \Exception("Nom de colonne `$name` invalide");
+      throw new Exception("Nom de colonne `$name` invalide");
     }
     $this->_name = $name;
     if (!in_array($type, array_merge(self::NUMERIC_TYPES, self::STRING_TYPES, self::DATE_TYPES, self::BOOLEAN_TYPES))) {
-      throw new \Exception("Type de colonne \"$type\" invalide");
+      throw new Exception("Type de colonne \"$type\" invalide");
+    }
+    if ($type === 'ENUM' && empty($enumValues)) {
+      throw new Exception("Type de colonne \"$type\" invalide, enumValues ne peut pas être vide");
     }
     $this->_type = $type;
     $this->_length = $length;
@@ -105,6 +114,8 @@ class Colonne
     $this->_referenceTable = $referenceTable;
     $this->_cascadeOnDelete = $cascadeOnDelete;
     $this->_cascadeOnUpdate = $cascadeOnUpdate;
+    $this->_enumValues = $enumValues;
+    $this->_table = $table;
   }
 
   /** Getters and Setters */
@@ -269,6 +280,46 @@ class Colonne
     return $this;
   }
 
+  public function getEnumValues(): ?array
+  {
+    return $this->_enumValues;
+  }
+
+
+  public function getQuotedEnumValues(): ?string
+  {
+    if ($this->getEnumValues() === null) {
+      return null;
+    }
+    $values = [];
+    foreach ($this->getEnumValues() as $value) {
+      if (!is_string($value) && !is_numeric($value)) {
+        throw new Exception("La valeur énumérée doit être une chaîne de caractères, ou numérique", [
+          "table" => $this->getTable()->getName(),
+          "column" => $this->getName(),
+          "value" => $value,
+        ]);
+      }
+      if (is_string($value)) {
+        $values[] = "'{$value}'";
+      } else {
+        $values[] = $value;
+      }
+    }
+    return implode(',', $values);
+  }
+
+  public function getTable(): ?Table
+  {
+    return $this->_table;
+  }
+
+  public function setTable(?Table $table): self
+  {
+    $this->_table = $table;
+    return $this;
+  }
+
 
   /** -------------------- */
 
@@ -277,7 +328,11 @@ class Colonne
   {
     $elements = [];
     $elements[] = $this->getQuotedName();
-    $elements[] = $this->getType() . ($this->getLength() !== null ? ("(" . $this->getLength() . ")") : '');
+    if ($this->getType() == "ENUM") {
+      $elements[] = $this->getType() . "({$this->getQuotedEnumValues()})";
+    } else {
+      $elements[] = $this->getType() . ($this->getLength() !== null ? ("(" . $this->getLength() . ")") : '');
+    }
     if ($this->isUnsigned()) {
       $elements[] = 'UNSIGNED';
     }
@@ -387,6 +442,10 @@ class Colonne
       $parameters["cascadeOnDelete"] ?? false,
       /*cascadeOnUpdate*/
       $parameters["cascadeOnUpdate"] ?? false,
+      /*enumValues*/
+      $parameters["enumValues"] ?? null,
+      /*table*/
+      $parameters["table"] ?? null,
     );
   }
 }

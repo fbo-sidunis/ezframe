@@ -7,7 +7,7 @@
       "length": 32,
       "null": false,
       "comment": "Code du rôle",
-      "index": true
+      "primary": true
     },
     {
       "name": "libelle",
@@ -19,7 +19,7 @@
     {
       "name": "defaut",
       "type": "ENUM",
-      "values": [
+      "enumValues": [
         "Y",
         "N"
       ],
@@ -29,18 +29,12 @@
     {
       "name": "actif",
       "type": "ENUM",
-      "values": [
+      "enumValues": [
         "Y",
         "N"
       ],
       "null": true,
-      "comment": "Rôle actif",
-      "index": true
-    }
-  ],
-  "indexes": [
-    {
-      "name": "actif"
+      "comment": "Rôle actif"
     }
   ],
   "comment": "Table des associations des rôles utilisateur"

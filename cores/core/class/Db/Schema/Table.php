@@ -163,6 +163,21 @@ class Table
   }
 
   /**
+   * Retourne les tables référencées par la table
+   * @return string[] 
+   */
+  public function getDependencies(): array
+  {
+    $dependencies = [];
+    foreach ($this->getColumns() as $key => $colonne) {
+      if ($colonne->getReferenceTable() && $colonne->getReferenceTable() !== $colonne->getName()) {
+        $dependencies[] = $colonne->getReferenceTable();
+      }
+    }
+    return $dependencies;
+  }
+
+  /**
    * Retourne une colonne de la table
    * @param mixed $name 
    * @return Colonne|null 
@@ -283,6 +298,10 @@ class Table
     foreach ($indexKeysToAdd as $key => $column) {
       $elements[] = "  ADD " . $column->getIndexLine();
     }
+    $elements[] = "COMMENT={$this->getQuotedComment()}";
+    $elements[] = "ENGINE=" . $this->getEngine();
+    $elements[] = "DEFAULT CHARSET=" . $this->getCharset();
+    $elements[] = "COLLATE=" . $this->getCollation();
 
     $elementsAlter[] = implode(",\n", $elements) . ";";
     return Db::db_exec(implode("\n", $elementsAlter));
@@ -300,7 +319,6 @@ class Table
   public static function createFromArray(array $table)
   {
     $columns = [];
-    // array_map(fn ($colonne) => Colonne::createFromArray($colonne), $table["columns"] ?? []);
     $previousColumn = null;
     foreach ($table["columns"] ?? [] as $key => $columnData) {
       $column = Colonne::createFromArray($columnData);
@@ -310,7 +328,7 @@ class Table
       $columns[] = $column;
       $previousColumn = $column;
     }
-    return new Table(
+    $table = new Table(
       $table["name"] ?? null,
       $columns,
       $table["comment"] ?? null,
@@ -318,5 +336,9 @@ class Table
       $table["charset"] ?? null,
       $table["collation"] ?? null,
     );
+    foreach ($table->getColumns() as $column) {
+      $column->setTable($table);
+    }
+    return $table;
   }
 }

@@ -13,7 +13,10 @@
     {
       "name": "actif",
       "type": "ENUM",
-      "length": "'Y','N'",
+      "enumValues": [
+        "Y",
+        "N"
+      ],
       "default": "Y",
       "null": false,
       "comment": "Utilisateur actif"

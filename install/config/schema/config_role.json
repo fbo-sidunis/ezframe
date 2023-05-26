@@ -7,7 +7,7 @@
       "length": 32,
       "null": false,
       "comment": "Code du rôle",
-      "primary": true
+      "index": true
     },
     {
       "name": "libelle",
@@ -37,5 +37,5 @@
       "comment": "Rôle actif"
     }
   ],
-  "comment": "Table des associations des rôles utilisateur"
+  "comment": "Table des rôles"
 }

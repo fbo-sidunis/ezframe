@@ -1,0 +1,29 @@
+#!/usr/bin/env php
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+use Core\CommandHandler;
+use Core\Common\Site;
+
+if (PHP_SAPI !== 'cli') {
+    echo 'bin/ezframe must be run as a CLI application';
+    exit(1);
+}
+
+try {
+    require __DIR__ . "/../vendor/autoload.php";
+    Site::initCli(__DIR__ . "/../");
+} catch (\Exception $e) {
+    echo 'Autoload error: ' . $e->getMessage();
+    exit(1);
+}
+
+try {
+    CommandHandler::handle();
+} catch (\Exception $e) {
+    echo $e->getMessage();
+    exit(1);
+}

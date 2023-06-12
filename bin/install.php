@@ -18,3 +18,4 @@ file_put_contents($composerFile, json_encode($composerConfig, JSON_PRETTY_PRINT)
 copy($project_path . "/.env.example", $project_path . "/.env");
 unlink($project_path . "/.env.example");
 shell_exec("composer dump-autoload");
+chmod($project_path . "/bin/ezframe", 0755);

@@ -37,7 +37,6 @@ class Site
     return [
       "TEMPLATES" => TEMPLATES,
       "ENV" => ENV,
-      "SITEDIR" => SITEDIR,
       "DEBUG" => DEBUG,
       "AUTODEBUG" => AUTODEBUG,
     ];
@@ -90,13 +89,11 @@ class Site
     //-------------------------------------------------------------//
     if (!defined("ROOT_DIR")) define("ROOT_DIR", realpath($rootDir) . "/");
     if (!defined("APP_DIR")) define("APP_DIR", ROOT_DIR . "app/");
-    if (!defined("FRAMEWORK_DIR")) define("FRAMEWORK_DIR", realpath(__DIR__ . "/../../../") . "/");
+    if (!defined("LIBRARY_DIR")) define("LIBRARY_DIR", realpath(__DIR__ . "/../../../") . "/");
     if (!defined("TEMPLATES")) define("TEMPLATES", getConfig('twig.templates'));
-    if (!defined("SITEDIR")) define("SITEDIR", getConfig('siteDir'));
     if (!defined("SITE_TITLE")) define("SITE_TITLE", getConfig('title'));
     if (!defined("DEBUG")) define("DEBUG", getConfig('debug'));
     if (!defined("AUTODEBUG")) define("AUTODEBUG", getConfig('autodebug'));
-    if (!defined("LIBRARY_DIR")) define("LIBRARY_DIR", ROOT_DIR . "vendor/groupefbo/ezframe/");
 
     //-------------------------------------------------------------//
     // Initialisation des constantes Environnement

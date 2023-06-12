@@ -316,7 +316,7 @@ class Extension extends AbstractExtension
 
   private static function getAssetsPaths()
   {
-    $frameworkDir = str_replace("\\", "/", FRAMEWORK_DIR);
+    $frameworkDir = str_replace("\\", "/", LIBRARY_DIR);
     $rootDir = str_replace("\\", "/", ROOT_DIR);
     $frameworkPath = str_replace($rootDir, "", $frameworkDir);
     $fwPaths = $frameworkPath ? [$frameworkPath . self::ASSETS_PATH, $frameworkPath] : [];

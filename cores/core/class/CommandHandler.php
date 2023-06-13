@@ -8,8 +8,16 @@
 
 namespace Core;
 
+use Exception;
+
 class CommandHandler
 {
+  /**
+   * Permet de gérer les commandes
+   * Ne pas utiliser en dehors de bin/ezframe
+   * @return void 
+   * @throws Exception 
+   */
   public static function handle()
   {
     // On récupère le premier argument de la commande
@@ -46,6 +54,11 @@ class CommandHandler
     $handler->execute();
   }
 
+  /**
+   * Permet de récupérer une option de la commande
+   * @param mixed $name 
+   * @return string|false|null 
+   */
   protected function getOption($name)
   {
     $options = getopt("", [$name . "::"]);

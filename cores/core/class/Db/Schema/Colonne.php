@@ -67,6 +67,11 @@ class Colonne
   protected bool $_cascadeOnUpdate = false;
   protected ?Colonne $_previousColumn = null;
   protected ?array $_enumValues = null;
+  /**
+   * Colonne à renommer
+   * @var string|string[]|null
+   */
+  protected mixed $_renameFrom = null;
   protected ?Table $_table = null;
 
   public function __construct(
@@ -87,6 +92,7 @@ class Colonne
     bool $cascadeOnDelete = false,
     bool $cascadeOnUpdate = false,
     ?array $enumValues = null,
+    mixed $renameFrom = null,
     ?Table $table = null
   ) {
     if (empty($name)) {
@@ -115,6 +121,7 @@ class Colonne
     $this->_cascadeOnDelete = $cascadeOnDelete;
     $this->_cascadeOnUpdate = $cascadeOnUpdate;
     $this->_enumValues = $enumValues;
+    $this->_renameFrom = $renameFrom;
     $this->_table = $table;
   }
 
@@ -309,6 +316,44 @@ class Colonne
     return implode(',', $values);
   }
 
+  public function getRenameFrom(): mixed
+  {
+    return $this->_renameFrom;
+  }
+
+  public function getQuotedRenameFrom(): ?string
+  {
+    if ($this->getRenameFrom() === null) {
+      return null;
+    }
+    if (!is_string($this->getRenameFrom())) {
+      throw new Exception("Le nom de la colonne renommée doit être une chaîne de caractères", [
+        "table" => $this->getTable()->getName(),
+        "column" => $this->getName(),
+        "renameFrom" => $this->getRenameFrom(),
+      ]);
+    }
+    return "`{$this->getRenameFrom()}`";
+  }
+
+  public function setRenameFrom(?string $renameFrom): self
+  {
+    $this->_renameFrom = $renameFrom;
+    return $this;
+  }
+
+  public function isRenamedFrom($name): bool
+  {
+    $renameFrom = $this->getRenameFrom();
+    if ($renameFrom === null) {
+      return false;
+    }
+    if (is_array($renameFrom)) {
+      return in_array($name, $renameFrom);
+    }
+    return $renameFrom == $name;
+  }
+
   public function getTable(): ?Table
   {
     return $this->_table;
@@ -444,6 +489,8 @@ class Colonne
       $parameters["cascadeOnUpdate"] ?? false,
       /*enumValues*/
       $parameters["enumValues"] ?? null,
+      /*renameFrom*/
+      $parameters["renameFrom"] ?? null,
       /*table*/
       $parameters["table"] ?? null,
     );

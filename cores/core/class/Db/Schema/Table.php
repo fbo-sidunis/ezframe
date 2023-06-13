@@ -3,6 +3,7 @@
 namespace Core\Db\Schema;
 
 use Core\Db;
+use Core\Exception;
 
 /**
  * Class table, symbolise une  table
@@ -19,6 +20,7 @@ class Table
   protected ?string $_engine = "InnoDB";
   protected ?string $_charset = "utf8mb4";
   protected ?string $_collation = "utf8mb4_unicode_ci";
+  protected mixed $_renameFrom = null;
 
   public function __construct(
     string $name,
@@ -26,7 +28,8 @@ class Table
     ?string $comment = null,
     ?string $engine = "InnoDB",
     ?string $charset = "utf8mb4",
-    ?string $collation = "utf8mb4_unicode_ci"
+    ?string $collation = "utf8mb4_unicode_ci",
+    mixed $renameFrom = null
   ) {
     $this->_name = $name;
     $this->_columns = $columns;
@@ -34,6 +37,7 @@ class Table
     $this->_engine = $engine ?? "InnoDB";
     $this->_charset = $charset ?? "utf8mb4";
     $this->_collation = $collation ?? $this->_charset . "_unicode_ci";
+    $this->_renameFrom = $renameFrom;
   }
 
   /**
@@ -88,6 +92,37 @@ class Table
     return $this->_collation;
   }
 
+  public function getRenameFrom(): mixed
+  {
+    return $this->_renameFrom;
+  }
+
+  public function getQuotedRenameFrom(): ?string
+  {
+    if ($this->getRenameFrom() === null) {
+      return null;
+    }
+    if (!is_string($this->getRenameFrom())) {
+      throw new Exception("Le nom de la colonne renommée doit être une chaîne de caractères", [
+        "table" => $this->getName(),
+        "renameFrom" => $this->getRenameFrom(),
+      ]);
+    }
+    return "`{$this->getRenameFrom()}`";
+  }
+
+  public function isRenamedFrom($name): bool
+  {
+    $renameFrom = $this->getRenameFrom();
+    if ($renameFrom === null) {
+      return false;
+    }
+    if (is_array($renameFrom)) {
+      return in_array($name, $renameFrom);
+    }
+    return $renameFrom == $name;
+  }
+
   /**
    * Setters
    */
@@ -123,6 +158,12 @@ class Table
     return $this;
   }
 
+  public function setRenameFrom(mixed $renameFrom): self
+  {
+    $this->_renameFrom = $renameFrom;
+    return $this;
+  }
+
   /**
    * Ajoute une colonne à la table
    * @param Colonne $colonne
@@ -150,10 +191,27 @@ class Table
     return $this;
   }
 
-  public function isTableInDb()
+  public function isTableInDb($tableName = null)
   {
     $tables = Db::showTables();
-    return in_array($this->_name, $tables);
+    return in_array($tableName ?? $this->_name, $tables);
+  }
+
+  public function isRenameFromInDb()
+  {
+    if ($this->getRenameFrom() === null) {
+      return false;
+    }
+    if (is_array($this->getRenameFrom())) {
+      foreach ($this->getRenameFrom() as $renameFrom) {
+        if ($this->isTableInDb($renameFrom)) {
+          $this->setRenameFrom($renameFrom);
+          return true;
+        }
+      }
+      return false;
+    }
+    return $this->isTableInDb($this->getRenameFrom());
   }
 
   public function getColumnsInDb()
@@ -241,6 +299,7 @@ class Table
     $columnsInDb = $this->getColumnsInDb();
     $columnsInTable = $this->getColumns();
     $keysInDb = $this->getKeysInDb();
+
     $columnsNameInDb = array_map(fn ($colonne) => $colonne["Field"], $columnsInDb);
     $columnsNameInTable = array_map(fn ($colonne) => $colonne->getName(), $columnsInTable);
     $columnsToDrop = array_filter($columnsInDb, fn ($colonne) => !in_array($colonne["Field"], $columnsNameInTable));
@@ -264,6 +323,17 @@ class Table
     $indexKeysNameInTable = array_map(fn ($colonne) => $colonne->getName(), $indexKeysInTable);
     $indexKeysToDrop = array_filter($indexKeysInDb, fn ($key) => !in_array($key["Column_name"], $indexKeysNameInTable));
     $indexKeysToAdd = array_filter($indexKeysInTable, fn ($colonne) => !in_array($colonne->getName(), $indexKeysNameInDb));
+    $columnToRename = [];
+    foreach ($columnsToAdd as $key => $column) {
+      foreach ($columnsToDrop as $key2 => $column2) {
+        if ($column->isRenamedFrom($column2)) {
+          $column = $column->setRenameFrom($column2);
+          $columnToRename[] = $column;
+          unset($columnsToAdd[$key]);
+          unset($columnsToDrop[$key2]);
+        }
+      }
+    }
 
     $elementsAlter = ["ALTER TABLE " . $this->getQuotedName()];
     $elements = [];
@@ -289,6 +359,10 @@ class Table
     foreach ($columnsToModify as $key => $column) {
       $elements[] = "  MODIFY " . $column->getColumnLine() . " " . $column->getAfterLine();
     }
+
+    foreach ($columnToRename as $key => $column) {
+      $elements[] = "  CHANGE COLUMN " . $column->getQuotedRenameFrom() . " " . $column->getColumnLine() . " " . $column->getAfterLine();
+    }
     foreach ($primaryKeysToAdd as $key => $column) {
       $elements[] = "  ADD " . $column->getPrimaryLine();
     }
@@ -309,6 +383,9 @@ class Table
 
   public function update()
   {
+    if ($this->isRenameFromInDb()) {
+      $this->rename();
+    }
     if ($this->isTableInDb()) {
       return $this->alter();
     } else {
@@ -335,10 +412,17 @@ class Table
       $table["engine"] ?? null,
       $table["charset"] ?? null,
       $table["collation"] ?? null,
+      $table["renameFrom"] ?? null,
     );
     foreach ($table->getColumns() as $column) {
       $column->setTable($table);
     }
     return $table;
+  }
+
+  protected function rename()
+  {
+    $sql = "RENAME TABLE {$this->getQuotedRenameFrom()} TO {$this->getQuotedName()};";
+    return Db::db_exec($sql);
   }
 }

@@ -12,6 +12,7 @@ use Exception;
 
 class CommandHandler
 {
+  protected $options = [];
   /**
    * Permet de gérer les commandes
    * Ne pas utiliser en dehors de bin/ezframe
@@ -51,17 +52,91 @@ class CommandHandler
       throw new \Exception("La classe donnée n'a pas de fonction execute");
     }
     $handler = new $classe;
+    $handler->retreiveAllOptionsFromCommand();
     $handler->execute();
   }
 
   /**
-   * Permet de récupérer une option de la commande
-   * @param mixed $name 
-   * @return string|false|null 
+   * Permet de récupérer toutes les options de la commande
+   * @return void
    */
+  public function retreiveAllOptionsFromCommand()
+  {
+    $options = [];
+    foreach ($_SERVER['argv'] as $key => $value) {
+      if (preg_match("/^--([a-z]+)=([a-z0-9]+)$/i", $value, $matches)) {
+        $options[$matches[1]] = $matches[2];
+      }
+    }
+    $this->options = $options;
+  }
+
   protected function getOption($name)
   {
-    $options = getopt("", [$name . "::"]);
-    return $options[$name] ?? null;
+    return $this->options[$name] ?? null;
+  }
+
+  protected function getOptions()
+  {
+    return $this->options;
+  }
+
+  /**
+   * Permet de récupérer les arguments de la commande
+   * @return array 
+   */
+  protected function getArguments()
+  {
+    return $_SERVER['argv'] ?? [];
+  }
+
+  /**
+   * Permet de récupérer un argument de la commande
+   * @param mixed $index 
+   * @return string|false|null 
+   */
+  protected function getArgument($index)
+  {
+    return $this->getArguments()[$index] ?? null;
+  }
+
+  /**
+   * Permet de récupérer le nom de la commande
+   * @return string 
+   */
+  protected function getCommandName()
+  {
+    return $_SERVER['argv'][1] ?? null;
+  }
+
+  /**
+   * Permet de récupérer le nom du module de la commande
+   * @return string 
+   */
+  protected function getModuleName()
+  {
+    $command = $this->getCommandName();
+    $commandComponents = explode(":", $command);
+    return ucfirst($commandComponents[0] ?? "");
+  }
+
+  /**
+   * Permet de récupérer le nom de l'action de la commande
+   * @return string 
+   */
+  protected function getActionName()
+  {
+    $command = $this->getCommandName();
+    $commandComponents = explode(":", $command);
+    return ucfirst($commandComponents[1] ?? "");
+  }
+
+  /**
+   * Permet de récupérer le nom de la classe de la commande
+   * @return string 
+   */
+  protected function getClassName()
+  {
+    return get_class($this);
   }
 }

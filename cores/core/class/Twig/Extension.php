@@ -3,6 +3,7 @@
 namespace Core\Twig;
 
 use Core\Common\Site;
+use Core\Start\Dump;
 use Twig\Extension\AbstractExtension;
 use Twig\Markup;
 use Twig\Template;
@@ -80,9 +81,9 @@ class Extension extends AbstractExtension
           $vars[$key] = $value;
         }
       }
-      dump($vars);
+      Dump::dumpHtml($vars);
     } else {
-      dump(...$vars);
+      Dump::dumpHtml(...$vars);
     }
   }
 

@@ -256,6 +256,12 @@ class Table
     return $keys;
   }
 
+  public function getForeignKeysInDb()
+  {
+    $keys = Db::getForeignKeys($this->_name);
+    return $keys;
+  }
+
   public static function drop($name)
   {
     return Db::dropTable($name);
@@ -299,6 +305,7 @@ class Table
     $columnsInDb = $this->getColumnsInDb();
     $columnsInTable = $this->getColumns();
     $keysInDb = $this->getKeysInDb();
+    $foreignKeysInDb = $this->getForeignKeysInDb();
 
     $columnsNameInDb = array_map(fn ($colonne) => $colonne["Field"], $columnsInDb);
     $columnsNameInTable = array_map(fn ($colonne) => $colonne->getName(), $columnsInTable);
@@ -323,6 +330,27 @@ class Table
     $indexKeysNameInTable = array_map(fn ($colonne) => $colonne->getName(), $indexKeysInTable);
     $indexKeysToDrop = array_filter($indexKeysInDb, fn ($key) => !in_array($key["Column_name"], $indexKeysNameInTable));
     $indexKeysToAdd = array_filter($indexKeysInTable, fn ($colonne) => !in_array($colonne->getName(), $indexKeysNameInDb));
+
+    $foreignKeysInTable = array_filter($columnsInTable, fn ($colonne) => $colonne->getReferenceTable() !== null);
+    //On drop les foreign keys si la paire clé étrangère / clé référencée n'est pas dans nos colonnes dans la table
+    $foreignKeysToDrop = array_filter($foreignKeysInDb, function ($key) use ($foreignKeysInTable) {
+      foreach ($foreignKeysInTable as $key2 => $colonne) {
+        if ($colonne->getName() === $key["COLUMN_NAME"] && $colonne->getReferenceColumn() === $key["REFERENCED_TABLE_NAME"]) {
+          return false;
+        }
+      }
+      return true;
+    });
+    //On ajoute les foreign keys si la paire clé étrangère / clé référencée n'est pas dans nos colonnes dans la table
+    $foreignKeysToAdd = array_filter($foreignKeysInTable, function ($colonne) use ($foreignKeysInDb) {
+      foreach ($foreignKeysInDb as $key => $key2) {
+        if ($colonne->getName() === $key2["COLUMN_NAME"] && $colonne->getReferenceColumn() === $key2["REFERENCED_TABLE_NAME"]) {
+          return false;
+        }
+      }
+      return true;
+    });
+
     $columnToRename = [];
     foreach ($columnsToAdd as $key => $column) {
       foreach ($columnsToDrop as $key2 => $column2) {
@@ -339,6 +367,12 @@ class Table
     $elements = [];
     foreach ($primaryKeysToDrop as $key => $column) {
       $elements[] = "  DROP PRIMARY KEY";
+    }
+    foreach ($foreignKeysToDrop as $key => $column) {
+      $elements[] = "  DROP FOREIGN KEY " . $column["CONSTRAINT_NAME"];
+    }
+    foreach ($foreignKeysToAdd as $key => $column) {
+      $elements[] = "  ADD " . $column->getForeignKeyLine();
     }
     foreach ($uniqueKeysToDrop as $key => $column) {
       if ($this->getColumnByName($column["Column_name"])->getReferenceColumn() !== null) {

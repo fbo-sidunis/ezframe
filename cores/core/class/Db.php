@@ -429,6 +429,41 @@ class Db
     return self::db_all_group($query->getSql());
   }
 
+  public static function getForeignKeys($tbl = null, $referenceTbl = null)
+  {
+    $jsonBDD = json_decode(file_get_contents(ROOT_DIR . "config/bdd.json"));
+    $dbname = $jsonBDD->{ENV}->dbname;
+    $query = new SQLBuilder([
+      "colonnes" => [
+        "TABLE_NAME",
+        "COLUMN_NAME",
+        "CONSTRAINT_NAME",
+        "REFERENCED_TABLE_NAME",
+        "REFERENCED_COLUMN_NAME",
+      ],
+      "table" => "information_schema.KEY_COLUMN_USAGE",
+      "conditions" => [
+        "TABLE_SCHEMA = :dbname",
+        "REFERENCED_TABLE_NAME IS NOT NULL",
+        "REFERENCED_COLUMN_NAME IS NOT NULL",
+      ],
+      "values" => [
+        "dbname" => $dbname,
+      ],
+    ]);
+    if ($tbl) {
+      $query->addCondition("TABLE_NAME = :tbl");
+      $query->addValue(["tbl" => $tbl]);
+    }
+    if ($referenceTbl) {
+      $query->addCondition("REFERENCED_TABLE_NAME = :referenceTbl");
+      $query->addValue(["referenceTbl" => $referenceTbl]);
+    }
+    $sql = $query->getSql();
+    $datas = $query->getValues();
+    return self::db_all($sql, $datas);
+  }
+
   protected static function quoteIdentifier($str)
   {
     $str = trim($str);

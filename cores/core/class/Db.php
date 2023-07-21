@@ -100,7 +100,11 @@ class Db
       $this->rowCount = $this->prepare->rowCount();
     } catch (\Exception $e) {
       $logger = new Logger('db', [
-        new \Monolog\Handler\RotatingFileHandler(ROOT_DIR . "logs/db/db.log", Logger::ERROR, 30)
+        new \Monolog\Handler\RotatingFileHandler(
+          filename: ROOT_DIR . "logs/db/db.log",
+          level: Logger::ERROR,
+          maxFiles: 30,
+        )
       ]);
       // en cas d'erreur :
       $logger->error($e->getMessage(), [

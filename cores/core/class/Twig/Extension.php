@@ -4,6 +4,7 @@ namespace Core\Twig;
 
 use Core\Common\Site;
 use Core\Start\Dump;
+use Core\Twig\TokenParser\TemplateTokenParser;
 use Twig\Extension\AbstractExtension;
 use Twig\Markup;
 use Twig\Template;
@@ -17,6 +18,12 @@ class Extension extends AbstractExtension
 {
   private const ASSETS_PATH = "assets/";
   private static $additionalsAssetsPaths = [];
+  public function getTokenParsers(): array
+  {
+    return [
+      new TemplateTokenParser(),
+    ];
+  }
   public function getFilters()
   {
     return [
@@ -30,6 +37,7 @@ class Extension extends AbstractExtension
       new TwigFilter('group', [$this, "array_group"]),
       new TwigFilter('preg_replace', [$this, "preg_replace"]),
       new TwigFilter('time_format', [$this, "time_format"]),
+      new TwigFilter('template_js', [$this, "template_js"], ['is_safe' => ['all'], 'needs_environment' => true]),
     ];
   }
 
@@ -357,5 +365,14 @@ class Extension extends AbstractExtension
   public function time_format($time, $format = "H:i")
   {
     return date($format, strtotime("1970-01-01 $time"));
+  }
+
+  public function template_js(\Twig\Environment $env, $html, $attributes = [])
+  {
+    $attributes["type"] = $attributes["type"] ?? "text/x-template";
+    $sAttrs = $this->getAttrsString($env, $attributes, true);
+    $html = "<script $sAttrs>$html</script>";
+    dd($html);
+    return $env->createTemplate($html)->render([]);
   }
 }

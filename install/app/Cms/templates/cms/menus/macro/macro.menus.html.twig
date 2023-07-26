@@ -1,19 +1,17 @@
 {# macro pour afficher les menus #}
 {% macro recursiveMenu(MENUITEMS) %}
   <ul>
-  {% for MENU in MENUITEMS %}
-      {# <h4><a href="{{ path(MENU.route, MENU.routeParams) }}">{{ MENU }}</a></h4>   #}
-      <li>  
-            <h4>{{MENU.libelle}}</h4>
-      {% if MENU.children|length %}
-          
-              {% for child in MENU.children %}
-                  <h4>{{child.libelle}}</h4>
-                  {# {{ _self.recursiveMenu(child) }} #}
-              {% endfor %}
-          
-      {% endif %}
+    {% for MENU in MENUITEMS %}
+      {# <h4><a href="{{ path(MENU.route, MENU.routeParams) }}">{{ MENU }}</a></h4> #}
+      <li>
+        <h4>{{ MENU.libelle }}</h4>
+        {% if MENU.children|length %}
+          {% for child in MENU.children %}
+            <h4>{{ child.libelle }}</h4>
+            {# {{ _self.recursiveMenu(child) }} #}
+          {% endfor %}
+        {% endif %}
       </li>
-  {% endfor %}
+    {% endfor %}
   </ul>
 {% endmacro %}

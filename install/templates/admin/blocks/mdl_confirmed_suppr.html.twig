@@ -2,16 +2,14 @@
   <div class="modal-dialog modal-dialog-centered" role="document">
     <div class="modal-content">
       <div class="modal-header">
-      {% if xdebug == 2 %}
-        {% set xdtemplate = _self %}
-        {% include 'xdeb2.html.twig' %}
-      {% endif %}
+        {% if xdebug == 2 %}
+          {% set xdtemplate = _self %}
+          {% include 'xdeb2.html.twig' %}
+        {% endif %}
         <h5 class="modal-title">Supprimer</h5>
       </div>
-      <div class="modal-body">
-        Etes-vous sûr de vouloir supprimer cet utilisateurs ?
-      </div>
-      <input type="hidden" id="userid_suppr" value="">
+      <div class="modal-body">Etes-vous sûr de vouloir supprimer cet utilisateurs ?</div>
+      <input type="hidden" id="userid_suppr" value="" />
       <div class="modal-footer">
         <button type="button" class="btn btn-primary" id="btn_confirmed_suppr">Confirmer</button>
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>

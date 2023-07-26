@@ -2,33 +2,31 @@
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
-      {% if xdebug == 2 %}
-        {% set xdtemplate = _self %}
-        {% include 'xdeb2.html.twig' %}
-      {% endif %}
+        {% if xdebug == 2 %}
+          {% set xdtemplate = _self %}
+          {% include 'xdeb2.html.twig' %}
+        {% endif %}
         <h5 class="modal-title" id="mdl_title_add_user">Ajouter un utilisateur</h5>
       </div>
       <div class="modal-body">
         <form>
           <div class="form-group">
             <label class="col-form-label">Nom :</label>
-            <input type="text" class="form-control" id="inp_name_new_user">
+            <input type="text" class="form-control" id="inp_name_new_user" />
           </div>
           <div class="form-group">
             <label class="col-form-label">Prénom :</label>
-            <input type="text" class="form-control" id="inp_firstname_new_user">
+            <input type="text" class="form-control" id="inp_firstname_new_user" />
           </div>
           <div class="form-group">
             <label class="col-form-label">Email :</label>
-            <input type="text" class="form-control" id="inp_email_new_user">
+            <input type="text" class="form-control" id="inp_email_new_user" />
           </div>
           <label class="col-form-label">Mot de passe :</label>
           <div class="input-group mb-3">
-            <input type="text" class="form-control" aria-describedby="basic-addon2" id="inp_password_new_user">
+            <input type="text" class="form-control" aria-describedby="basic-addon2" id="inp_password_new_user" />
             <div class="input-group-append">
-              <button class="btn btn-outline-success" type="button" id="btn_generate_pwd">
-              <i class="fas fa-sync-alt"></i>
-              </button>
+              <button class="btn btn-outline-success" type="button" id="btn_generate_pwd"><i class="fass fa-sync-alt"></i></button>
             </div>
           </div>
           <div class="card" style="width: 18rem;">
@@ -37,13 +35,13 @@
             </div>
             <div class="card-body">
               {% for r in listRoles %}
-              <div class="custom-control custom-checkbox">
-                <input type="checkbox" class="custom-control-input cbx_role" id="{{ r.code }}" value="{{ r.code }}">
-                <label class="custom-control-label" for="{{ r.code }}">{{ r.libelle }}</label>
-              </div>
+                <div class="custom-control custom-checkbox">
+                  <input type="checkbox" class="custom-control-input cbx_role" id="{{ r.code }}" value="{{ r.code }}" />
+                  <label class="custom-control-label" for="{{ r.code }}">{{ r.libelle }}</label>
+                </div>
               {% endfor %}
-            </div>  
-          </div>  
+            </div>
+          </div>
         </form>
       </div>
       <div class="modal-footer">

@@ -1,91 +1,77 @@
-{% extends "cms/layout.html.twig" %}
+{% extends 'cms/layout.html.twig' %}
 
 {% block include_additional_libs %}
   {# {{style("libs/jquery-ui-1.13.1/jquery-ui.min.css")}}
   {{script("libs/jquery-ui-1.13.1/jquery-ui.min.js") }} #}
-  {{jsconst("DATATABLE_FR_PATH",asset("libs/datatables/datatable_fr.json"))}}
-  {{style("libs/datatables/datatables.min.css")}}
-  {{script("libs/datatables/datatables.min.js")}}
-  {{style("libs/quill/quill.bubble.css")}}
-  {{style("css/quill.css")}}
-  {{script("libs/quill/quill.min.js")}}
-  {{script("helpers/js/SidunisDataTable.js")}}
-  {{script("helpers/js/SidunisQuill.js")}}
-  {{script("helpers/js/BtnDelete.js")}}
-  {{script("helpers/js/Form.js")}}
-  {{script("js/blocks_list.js")}} {# Va chercher d'abord dans app/Cms/assets #}
-
+  {{ jsconst('DATATABLE_FR_PATH', asset('libs/datatables/datatable_fr.json')) }}
+  {{ style('libs/datatables/datatables.min.css') }}
+  {{ script('libs/datatables/datatables.min.js') }}
+  {{ style('libs/quill/quill.bubble.css') }}
+  {{ style('css/quill.css') }}
+  {{ script('libs/quill/quill.min.js') }}
+  {{ script('helpers/js/SidunisDataTable.js') }}
+  {{ script('helpers/js/SidunisQuill.js') }}
+  {{ script('helpers/js/BtnDelete.js') }}
+  {{ script('helpers/js/Form.js') }}
+  {{ script('js/blocks_list.js') }} {# Va chercher d'abord dans app/Cms/assets #}
 {% endblock %}
 
 {% block body %}
-
-<section class="row" id="blocks">
-
-  {# <a href="{{Route.get("blocks_details")}}" class="btn-filter">
+  <section class="row" id="blocks">
+    {# <a href="{{Route.get("blocks_details")}}" class="btn-filter">
         <h5>{{svg("imgs/svg/filter.svg")}} ajout d'un block</h5>
   </a> #}
 
-  {# Liste #}
-  <div class="col-12 col-xxl-9 order-xxl-0">
-    <div class="default-block datatables-large" id="block_blocks">
+    {# Liste #}
+    <div class="col-12 col-xxl-9 order-xxl-0">
+      <div class="default-block datatables-large" id="block_blocks">
+        <header>
+          <h2>Blocks</h2>
+        </header>
 
-      <header>
-        <h2>Blocks</h2>
-      </header>
+        <main>
+          <div class="d-flex justify-content-between align-items-center flex-wrap mb-5">
+            <button type="button" class="btn btn-secondary mt-2 mb-2 btn-edit-block" id="btn_add_block">+ Créer un nouveau bloc</button>
+          </div>
+          {# Table blocks #}
+          <table id="table_blocks" class="float-none row-border">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>LIBELLE</th>
+                <th>ID LAYOUT</th>
+                <th>CONTENT</th>
+                <th></th>
+              </tr>
+            </thead>
+          </table>
 
-      <main>
-        <div class="d-flex justify-content-between align-items-center flex-wrap mb-5">
-          <button type="button" class="btn btn-secondary mt-2 mb-2 btn-edit-block" id="btn_add_block">
-            + Créer un nouveau bloc
-          </button>
-        </div>
-        {# Table blocks #}
-        <table id="table_blocks" class="float-none row-border">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>LIBELLE</th>
-              <th>ID LAYOUT</th>
-              <th>CONTENT</th>
-              <th></th>
-            </tr>
-          </thead>
-        </table>
-
-        {# Templates #}
-        <script type="text/html" id="blocks_template_statut">
+          {# Templates #}
+          {% template { id: 'blocks_template_statut' } %}
           {# Classes de statut : success (valide) / ongoing (en cours de création) / pending (en attente de validation) / error (expiré) #}
           <span class="bubble mx-auto ${CLASS}" data-toggle="tooltip" data-placement="top" title="${STATUT}"></span>
-        </script>
-        <script type="text/html" id="blocks_template_actions">
+          {% endtemplate %}
+          {% template { id: 'blocks_template_actions' } %}
           <div class="d-flex justify-content-end">${CONTENT}</div>
-        </script>
+          {% endtemplate %}
+          {% template { id: 'blocks_template_action_editer' } %}
+          <button type="button" class="action-btn btn-edit-block" data-id="${ID}" data-toggle="tooltip" title="${TOOLTIP}"><i class="fass fa-pen-to-square"></i></button>
+          {% endtemplate %}
+          {% template { id: 'blocks_template_action_suppr' } %}
+          <button type="button" class="action-btn btn-delete-block" data-id="${ID}" data-toggle="tooltip" title="${TOOLTIP}"><i class="fass fa-trash-can"></i></button>
+          {% endtemplate %}
 
-        <script type="text/html" id="blocks_template_action_editer">
-          <button type="button" class="action-btn btn-edit-block" data-id="${ID}" data-toggle="tooltip" title="${TOOLTIP}">
-            <i class="fa-solid fa-pen-to-square"></i>
-          </button>
-        </script>
-        <script type="text/html" id="blocks_template_action_suppr">
-          <button type="button" class="action-btn btn-delete-block" data-id="${ID}" data-toggle="tooltip" title="${TOOLTIP}">
-            <i class="fa-solid fa-trash-can"></i>
-          </button>
-        </script>
+          {# Clear pour tableau #}
+          <div class="clearfix"></div>
 
-
-
-        {# Clear pour tableau #}
-        <div class="clearfix"></div>
-
-        {# Pagination #}
-        <div id="blocks_pagination">
-          {% include 'cms/shared/pagination.html.twig' %}
-        </div>
-      </main>
+          {# Pagination #}
+          <div id="blocks_pagination">
+            {% include 'cms/shared/pagination.html.twig' %}
+          </div>
+        </main>
+      </div>
     </div>
-  </div>
 
-  {% include "cms/blocks/modal/add_block.html.twig" %}
-
-</section>
+    {% include 'cms/blocks/modal/add_block.html.twig' %}
+  </section>
 {% endblock %}

@@ -1,4 +1,4 @@
-{% extends "layout.html.twig" %}
+{% extends 'layout.html.twig' %}
 {% block body %}
   {% if xdebug == 2 %}
     {% set xdtemplate = _self %}
@@ -8,8 +8,8 @@
     <div class="row">
       {% include 'admin/blocks/flt_users.html.twig' %}
       <button id="btn_add_user" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#mdl_add_user">
-        <i class="fas fa-plus" style="color:white"></i>
-        Ajouter un utilisateur    
+        <i class="fass fa-plus" style="color:white"></i>
+        Ajouter un utilisateur
       </button>
       {% include 'admin/blocks/mdl_add_user.html.twig' %}
     </div>

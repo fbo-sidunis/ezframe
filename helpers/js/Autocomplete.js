@@ -1,4 +1,4 @@
-export class Autocomplete {
+class Autocomplete {
   /** @type {HTMLInputElement} */
   _input;
   /** @type {HTMLDataListElement} */

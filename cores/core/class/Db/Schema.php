@@ -69,7 +69,11 @@ class Schema
 
     //Pour tous les fichiers .json, on crée une table et ses colonnes
     foreach ($filesPaths as $filePath) {
-      $content = $this->getContent($filePath);
+      try {
+        $content = $this->getContent($filePath);
+      } catch (\TypeError $e) {
+        throw new Exception("Erreur lors de la lecture du fichier $filePath : " . $e->getMessage());
+      }
       try {
         $table = Table::createFromArray($content);
         if (basename($filePath, ".json") !== $table->getName()) throw new Exception("Le nom de la table `" . $table->getName() . "` ne correspond pas au nom du fichier `$file`");

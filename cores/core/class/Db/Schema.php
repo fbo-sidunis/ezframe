@@ -75,6 +75,7 @@ class Schema
         throw new Exception("Erreur lors de la lecture du fichier $filePath : " . $e->getMessage());
       }
       try {
+        $content["schema"] = $this;
         $table = Table::createFromArray($content);
         if (basename($filePath, ".json") !== $table->getName()) throw new Exception("Le nom de la table `" . $table->getName() . "` ne correspond pas au nom du fichier `$file`");
         $this->addTable($table->getName(), $table);
@@ -95,6 +96,12 @@ class Schema
       if (empty($bDeps)) return 1;
       $aName = $a->getName();
       $bName = $b->getName();
+      $aDeps = array_map(function (Table $table) {
+        return $table->getName();
+      }, $aDeps);
+      $bDeps = array_map(function (Table $table) {
+        return $table->getName();
+      }, $bDeps);
       if (in_array($aName, $bDeps)) return -1;
       if (in_array($bName, $aDeps)) return 1;
       return 0;

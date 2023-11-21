@@ -25,7 +25,7 @@ class DataObject implements JsonSerializable
     if (!isset(static::$_modelClass)) {
       throw new Exception("Model class not defined");
     }
-    $this->setId($datas[static::$_modelClass::$pkey] ?? null);
+    $this->setId($datas[static::_getModelClass()::$pkey] ?? null);
     if ($this->getId()) {
       static::$_objects[$this->getId()] = $this;
     }
@@ -116,12 +116,13 @@ class DataObject implements JsonSerializable
   /** @return $this  */
   public function save($noclean = false)
   {
+    $modelClass = static::_getModelClass();
     if ($this->getId()) {
-      static::$_modelClass::updateBy($this->getId(), $noclean ? $this->getDatas() : $this->getCleanDatas());
-      $this->setDatas(static::$_modelClass::getBy($this->getId()));
+      $modelClass::updateBy($this->getId(), $noclean ? $this->getDatas() : $this->getCleanDatas());
+      $this->setDatas($modelClass::getBy($this->getId()));
     } else {
-      $this->setDatas(static::$_modelClass::create($this->datas));
-      $this->setId($this->getData(static::$_modelClass::$pkey));
+      $this->setDatas($modelClass::create($this->datas));
+      $this->setId($this->getData($modelClass::$pkey));
       static::$_objects[$this->getId()] = $this;
     }
     $this->origDatas = $this->datas;
@@ -148,7 +149,7 @@ class DataObject implements JsonSerializable
   public function delete()
   {
     if ($this->_id) {
-      static::$_modelClass::removeBy($this->getId());
+      static::_getModelClass()::removeBy($this->getId());
       unset(static::$_objects[$this->_id]);
       $this->_id = null;
     }
@@ -161,7 +162,7 @@ class DataObject implements JsonSerializable
   public static function getById(int|string $id): null|static
   {
     if (isset(static::$_objects[$id])) return static::$_objects[$id];
-    $datas = static::$_modelClass::getBy($id);
+    $datas = static::_getModelClass()::getBy($id);
     if (!$datas) return null;
     return new static($datas);
   }
@@ -208,20 +209,34 @@ class DataObject implements JsonSerializable
     $objects = [];
     $idsLoaded = static::$_objects ? array_keys(static::$_objects) : [];
     $idsToLoad = array_diff($ids, $idsLoaded);
-    $entries = $idsToLoad ? static::$_modelClass::getAllBy($idsToLoad) : [];
+    $modelClass = static::_getModelClass();
+    $entries = $idsToLoad ? $modelClass::getAllBy($idsToLoad) : [];
     foreach ($entries as $entry) {
-      $objects[$entry[static::$_modelClass::$pkey]] = new static($entry);
+      $objects[$entry[$modelClass::$pkey]] = new static($entry);
     }
+  }
+
+  public static function preloadByFilters(
+    array $filters = [],
+  ): void {
+    $modelClass = static::_getModelClass();
+    if (!method_exists($modelClass, "getByFilters")) {
+      throw new Exception("Model class " . $modelClass . " does not have a getByFilters method");
+    }
+    $ids = $modelClass::getByFilters([], $filters, "ids");
+    if (!$ids) return;
+    static::preloadByIds($ids);
   }
 
   /** @return void  */
   public static function preloadAll()
   {
-    $entries = static::$_modelClass::getList();
+    $entries = static::_getModelClass()::getList();
     foreach ($entries as $entry) {
       new static($entry);
     }
   }
+
 
   /** @return array  */
   public function jsonSerialize(): array
@@ -269,7 +284,7 @@ class DataObject implements JsonSerializable
     array $queryDatas = [],
     array $filters = [],
   ): array {
-    $modelClass = static::$_modelClass;
+    $modelClass = static::_getModelClass();
     if (!method_exists($modelClass, "getByFilters")) {
       throw new Exception("Model class " . $modelClass . " does not have a getByFilters method");
     }
@@ -282,7 +297,7 @@ class DataObject implements JsonSerializable
     array $queryDatas = [],
     array $filters = [],
   ): ?static {
-    $modelClass = static::$_modelClass;
+    $modelClass = static::_getModelClass();
     if (!method_exists($modelClass, "getByFilters")) {
       throw new Exception("Model class " . $modelClass . " does not have a getByFilters method");
     }
@@ -290,6 +305,24 @@ class DataObject implements JsonSerializable
     $id = $modelClass::getByFilters($queryDatas, $filters, "id");
     if (!$id) return null;
     return static::getById($id);
+  }
+
+  protected static function _getClass(): string
+  {
+    $overridenClasses = getConfig("overrides.dataObjects") ?: [];
+    if (isset($overridenClasses[static::class])) {
+      return $overridenClasses[static::class];
+    }
+    return static::class;
+  }
+
+  protected static function _getModelClass(): string
+  {
+    $overridenClasses = getConfig("overrides.models") ?: [];
+    if (isset($overridenClasses[static::$_modelClass])) {
+      return $overridenClasses[static::$_modelClass];
+    }
+    return static::$_modelClass;
   }
 
   //Fonctions magiques pour les getters et setters, permettent de faire $object->getNomClient() au lieu de $object->getData("nom_client")

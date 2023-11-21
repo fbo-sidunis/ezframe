@@ -3,6 +3,7 @@
 namespace Core\Db\Schema;
 
 use Core\Db;
+use Core\Db\Schema;
 use Core\Exception;
 
 /**
@@ -21,6 +22,7 @@ class Table
   protected ?string $_charset = "utf8mb4";
   protected ?string $_collation = "utf8mb4_unicode_ci";
   protected mixed $_renameFrom = null;
+  protected ?Schema $_schema = null;
 
   public function __construct(
     string $name,
@@ -29,7 +31,8 @@ class Table
     ?string $engine = "InnoDB",
     ?string $charset = "utf8mb4",
     ?string $collation = "utf8mb4_unicode_ci",
-    mixed $renameFrom = null
+    mixed $renameFrom = null,
+    ?Schema $schema = null
   ) {
     $this->_name = $name;
     $this->_columns = $columns;
@@ -38,6 +41,7 @@ class Table
     $this->_charset = $charset ?? "utf8mb4";
     $this->_collation = $collation ?? $this->_charset . "_unicode_ci";
     $this->_renameFrom = $renameFrom;
+    $this->_schema = $schema;
   }
 
   /**
@@ -95,6 +99,11 @@ class Table
   public function getRenameFrom(): mixed
   {
     return $this->_renameFrom;
+  }
+
+  public function getSchema(): ?Schema
+  {
+    return $this->_schema;
   }
 
   public function getQuotedRenameFrom(): ?string
@@ -222,17 +231,34 @@ class Table
 
   /**
    * Retourne les tables référencées par la table
-   * @return string[] 
+   * @return Table[] 
    */
   public function getDependencies(): array
   {
     $dependencies = [];
     foreach ($this->getColumns() as $key => $colonne) {
       if ($colonne->getReferenceTable() && $colonne->getReferenceTable() !== $colonne->getName()) {
-        $dependencies[] = $colonne->getReferenceTable();
+        $dependencies[] = $this->getSchema()->getTable($colonne->getReferenceTable());
       }
     }
     return $dependencies;
+  }
+
+  /**
+   * Retourne les tables dans lesquelles cette table est référencée
+   * @return Table[] 
+   */
+  public function getDependingTables(): array
+  {
+    $dependingTables = [];
+    foreach ($this->getSchema()->getTables() as $key => $table) {
+      foreach ($table->getColumns() as $key2 => $colonne) {
+        if ($colonne->getReferenceTable() === $this->getName()) {
+          $dependingTables[] = $table;
+        }
+      }
+    }
+    return $dependingTables;
   }
 
   /**
@@ -458,6 +484,7 @@ class Table
       $table["charset"] ?? null,
       $table["collation"] ?? null,
       $table["renameFrom"] ?? null,
+      $table["schema"] ?? null
     );
     foreach ($table->getColumns() as $column) {
       $column->setTable($table);

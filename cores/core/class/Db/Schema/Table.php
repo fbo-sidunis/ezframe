@@ -415,6 +415,17 @@ class Table
     return Db::db_exec(implode("\n", $elementsAlter));
   }
 
+  public function getPrimaryKeys()
+  {
+    $primaryKeys = [];
+    foreach ($this->getColumns() as $key => $colonne) {
+      if ($colonne->isPrimary()) {
+        $primaryKeys[] = $colonne;
+      }
+    }
+    return $primaryKeys;
+  }
+
   public function update()
   {
     if ($this->isRenameFromInDb()) {

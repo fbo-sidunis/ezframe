@@ -29,7 +29,6 @@ class DataObject implements JsonSerializable
     if ($this->getId()) {
       static::$_objects[$this->getId()] = $this;
     }
-    $this->origDatas = $this->datas;
   }
 
   /** @return void  */
@@ -68,7 +67,7 @@ class DataObject implements JsonSerializable
    */
   public function getOrigData(string $key)
   {
-    return $this->origDatas[$key] ?? null;
+    return $this->origDatas[$key] ?? $this->datas[$key] ?? null;
   }
 
   /** @return array  */
@@ -80,7 +79,7 @@ class DataObject implements JsonSerializable
   /** @return array  */
   public function getOrigDatas(): array
   {
-    return $this->origDatas;
+    return array_merge($this->datas, $this->origDatas);
   }
 
   /**
@@ -90,6 +89,14 @@ class DataObject implements JsonSerializable
    */
   public function setData(string $key, $value)
   {
+    $origData = $this->origDatas[$key] ?? null;
+    if ($origData === $value) {
+      if (isset($this->origDatas[$key])) {
+        unset($this->origDatas[$key]);
+      }
+    } else if (!isset($this->origDatas[$key])) {
+      $this->origDatas[$key] = $this->datas[$key] ?? null;
+    }
     $this->datas[$key] = $value;
     return $this;
   }
@@ -256,6 +263,33 @@ class DataObject implements JsonSerializable
   private static function camelCaseToSnakeCase(string $string)
   {
     return strtolower(preg_replace('/(?<!^)[A-Z]/', '_$0', $string));
+  }
+
+  public static function getByFilters(
+    array $queryDatas = [],
+    array $filters = [],
+  ): array {
+    $modelClass = static::$_modelClass;
+    if (!method_exists($modelClass, "getByFilters")) {
+      throw new Exception("Model class " . $modelClass . " does not have a getByFilters method");
+    }
+    $ids = $modelClass::getByFilters($queryDatas, $filters, "ids");
+    if (!$ids) return [];
+    return static::getListByIds($ids);
+  }
+
+  public static function getOneByFilters(
+    array $queryDatas = [],
+    array $filters = [],
+  ): ?static {
+    $modelClass = static::$_modelClass;
+    if (!method_exists($modelClass, "getByFilters")) {
+      throw new Exception("Model class " . $modelClass . " does not have a getByFilters method");
+    }
+    $queryDatas["length"] = 1;
+    $id = $modelClass::getByFilters($queryDatas, $filters, "id");
+    if (!$id) return null;
+    return static::getById($id);
   }
 
   //Fonctions magiques pour les getters et setters, permettent de faire $object->getNomClient() au lieu de $object->getData("nom_client")

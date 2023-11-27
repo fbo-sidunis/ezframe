@@ -90,6 +90,7 @@ class Update extends \Core\CommandHandler
   public function execute()
   {
     $this->logger->info("Start update");
+    $this->updateTo1_0();
     $this->updateTo1_5();
     $this->updateTo1_7();
     $this->logger->info("End update");

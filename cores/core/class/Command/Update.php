@@ -61,12 +61,18 @@ class Update extends \Core\CommandHandler
     sort($this->modifiedFiles);
     if (count($this->addedFiles) > 0) {
       echo "+ " . implode("\n+ ", $this->addedFiles) . "\n";
+    } else {
+      echo "No file added\n";
     }
     if (count($this->removedFiles) > 0) {
       echo "- " . implode("\n- ", $this->removedFiles) . "\n";
+    } else {
+      echo "No file removed\n";
     }
     if (count($this->modifiedFiles) > 0) {
       echo "* " . implode("\n* ", $this->modifiedFiles) . "\n";
+    } else {
+      echo "No file modified\n";
     }
   }
 
@@ -129,13 +135,13 @@ class Update extends \Core\CommandHandler
   public function updateTo1_5()
   {
     $envFile = ROOT_DIR . ".env";
-    if (!file_exists($envFile)) {
+    if (file_exists($envFile)) {
       return;
     }
     $siteConfigFile = json_decode(file_get_contents(self::SITE_CONFIG_FILE), true);
     $env = $siteConfigFile["env"] ?? "dev";
     unset($siteConfigFile["env"]);
-    file_put_contents($siteConfigFile, json_encode(self::SITE_CONFIG_FILE, JSON_PRETTY_PRINT));
+    file_put_contents(self::SITE_CONFIG_FILE, json_encode($siteConfigFile, JSON_PRETTY_PRINT));
     file_put_contents($envFile, "APP_ENV=$env\n");
     $this->addFile($envFile);
     $this->modifyFile(self::SITE_CONFIG_FILE);
@@ -145,6 +151,9 @@ class Update extends \Core\CommandHandler
   {
     $composerFile = ROOT_DIR . "composer.json";
     $composerConfig = json_decode(file_get_contents(self::COMPOSER_FILE), true);
+    if (isset($composerConfig["autoload"]["psr-4"]["Model\\"]) && $composerConfig["autoload"]["psr-4"]["Model\\"] == ["model/"]) {
+      return;
+    }
     $composerConfig["autoload"]["psr-4"]["Model\\"] = ["model/"];
     file_put_contents($composerFile, json_encode($composerConfig, JSON_PRETTY_PRINT));
     $this->modifyFile($composerFile);

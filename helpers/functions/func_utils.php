@@ -99,9 +99,9 @@ if (!function_exists("pathUrl")) {
     //ALIAS
     if (!empty($_SERVER['CONTEXT_PREFIX'])) {
       $root .= $_SERVER['CONTEXT_PREFIX'];
-      $root .= substr($dir, strlen($_SERVER['CONTEXT_DOCUMENT_ROOT']));
+      $root .= substr($dir, strlen($_SERVER['CONTEXT_DOCUMENT_ROOT'] ?? ""));
     } else {
-      $root .= substr($dir, strlen($_SERVER['DOCUMENT_ROOT']));
+      $root .= substr($dir, strlen($_SERVER['DOCUMENT_ROOT'] ?? ""));
     }
 
     $root .= '/';
@@ -124,9 +124,9 @@ if (!function_exists("relativePathUrl")) {
     //ALIAS
     if (!empty($_SERVER['CONTEXT_PREFIX'])) {
       $root .= $_SERVER['CONTEXT_PREFIX'];
-      $root .= substr($dir, strlen($_SERVER['CONTEXT_DOCUMENT_ROOT']));
+      $root .= substr($dir, strlen($_SERVER['CONTEXT_DOCUMENT_ROOT'] ?? ""));
     } else {
-      $root .= substr($dir, strlen($_SERVER['DOCUMENT_ROOT']));
+      $root .= substr($dir, strlen($_SERVER['DOCUMENT_ROOT'] ?? ""));
     }
 
     $root .= '/';
@@ -555,7 +555,7 @@ if (!function_exists("escape_attr_html")) {
        * Check if the current character to escape has a name entity we should
        * replace it with while grabbing the hex value of the character.
        */
-      if (1 === \strlen($chr)) {
+      if (1 === \strlen($chr ?? "")) {
         /*
            * While HTML supports far more named entities, the lowest common denominator
            * has become HTML5's XML Serialisation which is restricted to the those named

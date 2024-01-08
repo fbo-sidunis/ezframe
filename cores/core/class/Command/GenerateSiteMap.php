@@ -18,7 +18,7 @@ class GenerateSiteMap extends \Core\CommandHandler
   {
     $this->logger = new Logger("sitemap", [
       new RotatingFileHandler(
-        filename: ROOT_DIR . "logs/sitemap/sitemap.log",
+        filename: ROOT_DIR . "var/log/sitemap/sitemap.log",
         maxFiles: 3,
         level: Logger::DEBUG,
       ),

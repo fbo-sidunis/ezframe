@@ -1,6 +1,7 @@
 <?php
 
 use Core\Common\Site;
+use Core\Response\JsonResponse;
 
 if (!function_exists("ucfirst")) {
   function ucfirst(string $string): string
@@ -209,16 +210,14 @@ if (!function_exists("redirectURL")) {
    * Redirige vers une URL donnée
    * @param string $url [L'URL en question]
    * @param int $code [Code d'erreur retourné]
-   * @return bool 
+   * @return void 
    */
   function redirectURL($url)
   {
     if (!empty($url)) {
       header("Location: $url", TRUE, 301);
       exit;
-      return true;
     }
-    return false;
   }
 }
 if (!function_exists("redirectRoute")) {
@@ -242,15 +241,17 @@ if (!function_exists("jsonResponse")) {
    * Echo une réponse JSON et stoppe le code
    * @param array $datas [Contenu de la réponse JSON]
    * @param int $code [Code d'erreur retourné]
-   * @return false 
+   * @return JsonResponse 
    */
   function jsonResponse($datas, $code = 200)
   {
     http_response_code($code);
-    header('Content-Type: application/json; charset=utf-8');
-    echo json_encode($datas);
-    exit;
-    return false;
+    return new JsonResponse(
+      [],
+      "",
+      true,
+      $datas
+    );
   }
 }
 
@@ -259,13 +260,16 @@ if (!function_exists("successResponse")) {
    * Echo un réponse pré-formatée de type "succès" avec un result = 1
    * @param mixed $datas [Contenu de l'argument "data" de la réponse]
    * @param string $message [Contenu de l'argument "message" de la réponse]
-   * @return false 
+   * @return JsonResponse 
    */
   function successResponse(array $datas = [], string $message = "")
   {
-    return jsonResponse([
-      "result" => 1, "message" => $message, "data" => $datas
-    ]);
+    http_response_code(200);
+    return new JsonResponse(
+      $datas,
+      $message,
+      true
+    );
   }
 }
 
@@ -275,13 +279,16 @@ if (!function_exists("errorResponse")) {
    * @param mixed $datas [Contenu de l'argument "data" de la réponse]
    * @param string $message [Contenu de l'argument "message" de la réponse]
    * @param int $code [Code d'erreur retourné]
-   * @return false 
+   * @return JsonResponse 
    */
   function errorResponse(array $datas = [], string $message = "", int $code = 500)
   {
-    return jsonResponse([
-      "result" => 0, "message" => $message, "data" => $datas
-    ], $code);
+    http_response_code($code);
+    return new JsonResponse(
+      $datas,
+      $message,
+      false
+    );
   }
 }
 

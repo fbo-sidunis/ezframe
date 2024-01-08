@@ -1,0 +1,14 @@
+{
+	"/api/rest/login/": {
+		"alias": "api_rest_login",
+		"vars": {
+			"f": "login"
+		}
+	},
+	"/api/rest/v1/{subject}/{function}/": {
+		"alias": "api_rest_v1",
+		"vars": {
+			"f": "api"
+		}
+	}
+}

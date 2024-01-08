@@ -2,19 +2,26 @@
 
 namespace App\Auth\Controller;
 
+use Core\Annotation\Route;
 use Core\Db\User;
+use Core\Response\HtmlResponse;
+use Core\Response\JsonResponse;
 
-class CompteController extends \Core\Controller {
+class CompteController extends \Core\Controller
+{
 
-  public function render() {
+  public function render(): HtmlResponse
+  {
     return $this->display();
   }
 
-  public function getCompte() {
+  public function getCompte(): HtmlResponse
+  {
     return $this->display();
   }
 
-  public function ajax_save() {
+  public function ajax_save(): JsonResponse
+  {
     $datas = [];
     $nom = getPost('nom');
     $prenom = getPost('prenom');
@@ -22,15 +29,12 @@ class CompteController extends \Core\Controller {
     $userid = $this->user->getId();
     $error = NULL;
     if ($userid) {
-        $datas['success'] = User::updateUser($userid, $nom, $prenom, $mail);
+      $datas['success'] = User::updateUser($userid, $nom, $prenom, $mail);
     } else {
-      return errorResponse([],"Vous devez remplir tous les champs");
+      return errorResponse([], "Vous devez remplir tous les champs");
     }
 
     $datas['error'] = $error;
     return successResponse($datas);
   }
-
 }
-
-?>

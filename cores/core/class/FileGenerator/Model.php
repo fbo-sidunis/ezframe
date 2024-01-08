@@ -108,12 +108,7 @@ class Model extends FileGenerator
     foreach ($table->getColumns() as $column) {
       $camelCaseName = self::snakeCaseToCamelCase($column->getName());
       $content[] = "\t\tif (\$$camelCaseName !== null) {";
-      $content[] = "\t\t\tif (is_array(\$$camelCaseName)) {";
-      $content[] = "\t\t\t\t\$query->addCondition(self::al(\"{$column->getName()}\") . \" IN (\" . \$query->generatePlaceholdersAndValues(\$$camelCaseName, \"{$column->getName()}\") . \")\");";
-      $content[] = "\t\t\t} else {";
-      $content[] = "\t\t\t\t\$query->addCondition(self::al(\"{$column->getName()}\") . \" = :{$column->getName()}\");";
-      $content[] = "\t\t\t\t\$query->addValue([\":{$column->getName()}\" => \$$camelCaseName]);";
-      $content[] = "\t\t\t}";
+      $content[] = "\t\t\t\$query->handleGenericFilter(self::class,\"{$column->getName()}\", \$$camelCaseName);";
       $content[] = "\t\t}";
       $content[] = "\t\t";
     }

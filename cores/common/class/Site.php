@@ -2,10 +2,13 @@
 
 namespace Core\Common;
 
+use Core\Response;
+use Core\Response\HtmlResponse;
 use Core\Start\Dump;
 use Core\Start\I18n;
 use Core\Start\Route;
 use Core\Start\Twig;
+use Exception;
 use Monolog\ErrorHandler;
 use Monolog\Handler\RotatingFileHandler;
 use Monolog\Handler\StreamHandler;
@@ -31,6 +34,17 @@ class Site
    * @var \Core\Translator
    */
   private static $translator = null;
+
+  /**
+   * 
+   * @var Logger|null
+   */
+  private static $errorLogger = null;
+  /**
+   * 
+   * @var Logger|null
+   */
+  private static $errorLoggerFileOnly = null;
 
   public static function getSiteConfig_()
   {
@@ -70,6 +84,26 @@ class Site
   {
     self::$translator = $translator;
   }
+  public static function getErrorLogger()
+  {
+    if (self::$errorLogger === null) {
+      self::$errorLogger = new Logger("error", [
+        new RotatingFileHandler(ROOT_DIR . "var/log/error/error.log", 30),
+        new StreamHandler("php://output"),
+      ]);
+    }
+    return self::$errorLogger;
+  }
+
+  public static function getErrorLoggerFileOnly()
+  {
+    if (self::$errorLoggerFileOnly === null) {
+      self::$errorLoggerFileOnly = new Logger("error", [
+        new RotatingFileHandler(ROOT_DIR . "var/log/error/error.log", 30),
+      ]);
+    }
+    return self::$errorLoggerFileOnly;
+  }
 
   public static function init($rootDir)
   {
@@ -106,10 +140,7 @@ class Site
     //-------------------------------------------------------------//
     // Error logging
     //-------------------------------------------------------------//
-    ErrorHandler::register(new Logger("error", [
-      new RotatingFileHandler(ROOT_DIR . "logs/error/error.log", 30),
-      new StreamHandler("php://output"),
-    ]));
+    ErrorHandler::register(self::getErrorLogger());
     //-------------------------------------------------------------//
     // Initialisation config du site
     //-------------------------------------------------------------//
@@ -155,25 +186,27 @@ class Site
     //-------------------------------------------------------------//
     $datas = [];
     $_SESSION["is_logged"] = $_SESSION["is_logged"] ?? false;
-
+    $errorResponse = new HtmlResponse('404.html.twig', $datas);
+    $errorResponse->setErrorCode(404);
     if (!$routed) {
-      $datas['ERROR'] = 'Route inconnue';
-      self::notFound($datas);
+      $errorResponse->setData("ERROR", "Route inconnue");
+      return $errorResponse->display();
     }
     $routing = Site::getRouting();
     $page = $routing->vars['p'] ?? "";
     $mcv = explode(":", $page);
     $datas['xdebug'] = getGet('xdebug', 0);
-    $module = ucfirst(($routing->vars['m'] ?? null) ?: (($mcv[0] ?? null) ?: 'Home'));
-    $controller = ucfirst(($routing->vars['c'] ?? null) ?: (($mcv[1] ?? null) ?: 'Home'));
+    $module = ucfirst(($routing->vars['m'] ?? null) ?: (($mcv[0] ?? null) ?: 'Default'));
+    $controller = ucfirst(($routing->vars['c'] ?? null) ?: (($mcv[1] ?? null) ?: 'Default'));
     $methode = ucfirst(($routing->vars['f'] ?? null) ?: (($mcv[2] ?? null) ?: 'render'));
     $controllerClass = "\\App\\" . $module . "\\Controller\\" . $controller . "Controller";
     if (!class_exists($controllerClass)) {
+      $errorResponse->setData("ERROR", "Controller : " . $controllerClass . " inconnu");
       $datas['ERROR'] = "Controller : " . $controllerClass . " inconnu";
       if (DEBUG == true) {
-        $datas['DEBUG']['ERREURS'][] = "Classe : $controllerClass  introuvable !";
+        $errorResponse->setData("DEBUG", ["ERREURS" => ["Controller : " . $controllerClass . " inconnu"]]);
       }
-      self::notFound($datas);
+      return $errorResponse->display();
     }
     $datas['CTRL'] = [
       'module' => $module, 'controller' => $controller, 'methode' => $methode,
@@ -181,27 +214,46 @@ class Site
     ];
     $objPage = new $controllerClass($datas);
     if (!method_exists($objPage, $methode)) {
-      $datas['ERROR'] = 'Méthode inconnue';
+      $errorResponse->setData("ERROR", "Méthode : " . $methode . " inconnue");
       if (DEBUG == true) {
-        $datas['DEBUG']['ERREURS'][] = "Méthode : $methode  introuvable !";
+        $errorResponse->setData("DEBUG", ["ERREURS" => ["Méthode : " . $methode . " inconnue"]]);
       }
-      self::notFound($datas);
+      return $errorResponse->display();
     }
-    if (!$objPage->$methode()) {
-      $datas['ERROR'] = "Erreur lors du chargement de la méthode";
-      if (DEBUG == true) {
-        $datas['DEBUG']['ERREURS'][] = "Erreur lors du chargement de la méthode : " . $methode . " dans le controller :" . $controller;
+    //Get Method return type 
+    $reflection = new \ReflectionMethod($objPage, $methode);
+    $returnType = $reflection->getReturnType();
+    if ($returnType && $returnType instanceof \ReflectionNamedType) {
+      $returnType = $returnType->getName();
+    } else {
+      $returnType = Response::class;
+    }
+    $response = null;
+    try {
+      /** @var Response */
+      $response = $objPage->$methode();
+      $response->display();
+    } catch (\Throwable $e) {
+      /** @var \Exception|\Core\Exception|\TypeError $e */
+      $datas = (method_exists($e, 'getData') ? $e->getData() : []) ?: [];
+      $backtrace = [];
+      $traceLength = count($e->getTrace());
+      foreach ($e->getTrace() as $index => $trace) {
+        $backtrace[strval($traceLength - $index)] = [
+          "file" => $trace["file"] . ":" . $trace["line"],
+          "function" => implode("::", array_filter([$trace["class"] ?? null, $trace["function"] ?? null])) . "(" . implode(", ", array_map(function ($arg) {
+            return is_object($arg) ? get_class($arg) : json_encode($arg);
+          }, $trace["args"] ?? [])) . ")",
+        ];
       }
-      self::notFound($datas);
+      if ($returnType) {
+        $returnType::displayErrorResponse($e->getMessage(), $datas, $backtrace, $e->getFile(), $e->getLine());
+      }
+      self::getErrorLoggerFileOnly()->error($e->getMessage(), [
+        "file" => $e->getFile(),
+        "line" => $e->getLine(),
+      ]);
     }
-  }
-
-  public static function notFound($datas)
-  {
-    $tpl_404 = '404.html.twig';
-    http_response_code(404);
-    echo Site::getTwigEnvironnment()->render($tpl_404, $datas);
-    exit;
   }
   //--------- FIN DE LA CLASS -----------//
 }

@@ -1,70 +1,86 @@
-{% extends 'cms/layout.html.twig' %}
+{% extends "cms/layout.html.twig" %}
 
 {% block include_additional_libs %}
   {# {{style("libs/jquery-ui-1.13.1/jquery-ui.min.css")}}
   {{script("libs/jquery-ui-1.13.1/jquery-ui.min.js") }} #}
-  {{ jsconst('DATATABLE_FR_PATH', asset('libs/datatables/datatable_fr.json')) }}
-  {{ style('libs/datatables/datatables.min.css') }}
-  {{ script('libs/datatables/datatables.min.js') }}
-  {{ script('helpers/js/SidunisDataTable.js') }}
-  {{ script('helpers/js/Form.js') }}
-  {{ script('helpers/js/BtnDelete.js') }}
-  {{ script('app/Cms/assets/js/pages_list.js') }}
+  {{jsconst("DATATABLE_FR_PATH",asset("libs/datatables/datatable_fr.json"))}}
+  {{style("libs/datatables/datatables.min.css")}}
+  {{script("libs/datatables/datatables.min.js")}}
+  {{script("helpers/js/SidunisDataTable.js")}}
+  {{script("helpers/js/Form.js")}}
+  {{script("helpers/js/BtnDelete.js")}}
+  {{script("app/Cms/assets/js/pages_list.js")}}
+
 {% endblock %}
 
 {% block body %}
-  <section class="row" id="pages">
-    {# Liste #}
-    <div class="col-12 col-xxl-9 order-xxl-0">
-      <div class="default-block datatables-large" id="block_pages">
-        <header>
-          <h2>Pages</h2>
-        </header>
 
-        <main>
-          <div class="d-flex justify-content-between align-items-center flex-wrap mb-5">
-            <button type="button" class="btn btn-secondary mt-2 mb-2 btn-addedit-pages" id="btn_add_presta">+ Créer une nouvelle page</button>
-          </div>
-          {# Table pages #}
-          <table id="table_pages" class="float-none row-border">
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>LIBELLE</th>
-                <th>CREE PAR</th>
-                <th>DATE CRÉATION</th>
-                <th></th>
-              </tr>
-            </thead>
-          </table>
+<section class="row" id="pages">
 
-          {# Templates #}
-          {% template { id: 'pages_template_statut' } %}
+  {# Liste #}
+  <div class="col-12 col-xxl-9 order-xxl-0">
+    <div class="default-block datatables-large" id="block_pages">
+
+      <header>
+        <h2>Pages</h2>
+      </header>
+
+      <main>
+        <div class="d-flex justify-content-between align-items-center flex-wrap mb-5">
+          <button type="button" class="btn btn-secondary mt-2 mb-2 btn-addedit-pages" id="btn_add_presta">
+            + Créer une nouvelle page
+          </button>
+        </div>
+        {# Table pages #}
+        <table id="table_pages" class="float-none row-border">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>LIBELLE</th>
+              <th>CREE PAR</th>
+              <th>DATE CRÉATION</th>
+              <th></th>
+            </tr>
+          </thead>
+        </table>
+
+        {# Templates #}
+        <script type="text/html" id="pages_template_statut">
           {# Classes de statut : success (valide) / ongoing (en cours de création) / pending (en attente de validation) / error (expiré) #}
           <span class="bubble mx-auto ${CLASS}" data-toggle="tooltip" data-placement="top" title="${STATUT}"></span>
-          {% endtemplate %}
+        </script>
 
-          {% template { id: 'pages_template_actions' } %}
-          <div class="d-flex justify-content-end">{{ '${CONTENT}' }}</div>
-          {% endtemplate %}
+        <script type="text/html" id="pages_template_actions">
+          <div class="d-flex justify-content-end">${CONTENT}</div>
+        </script>
 
-          {% template { id: 'pages_template_action_editer' } %}
-          <button href="${URL_VOIR}" class="action-btn btn-addedit-pages btn btn-dark" data-id="${ID}" data-toggle="tooltip" title="${TOOLTIP}"><i class="fass fa-pen-to-square"></i></button>
-          {% endtemplate %}
-          {% template { id: 'pages_template_action_suppr' } %}
-          <button type="button" class="action-btn btn-delete-pages btn btn-light" data-id="${ID}" data-toggle="tooltip" title="${TOOLTIP}"><i class="fass fa-trash-can"></i></button>
-          {% endtemplate %}
+        <script type="text/html" id="pages_template_action_editer">
+          <button href="${URL_VOIR}" class="action-btn btn-addedit-pages btn btn-dark" data-id="${ID}" data-toggle="tooltip" title="${TOOLTIP}"> 
+            <i class="fa-solid fa-pen-to-square"></i>
+          </button>
+        </script>
+        <script type="text/html" id="pages_template_action_suppr">
+          <button type="button" class="action-btn btn-delete-pages btn btn-light" data-id="${ID}" data-toggle="tooltip" title="${TOOLTIP}">
+            <i class="fa-solid fa-trash-can"></i>
+          </button>
+        </script>
 
-          {# Clear pour tableau #}
-          <div class="clearfix"></div>
 
-          {# Pagination #}
-          <div id="pages_pagination">
-            {% include 'cms/shared/pagination.html.twig' %}
-          </div>
-        </main>
-        {% include 'cms/pages/modal/add_page.html.twig' %}
-      </div>
+
+        {# Clear pour tableau #}
+        <div class="clearfix"></div>
+
+        {# Pagination #}
+        <div id="pages_pagination">
+          {% include 'cms/shared/pagination.html.twig' %}
+        </div>
+      </main>
+      {% include "cms/pages/modal/add_page.html.twig" %}
     </div>
-  </section>
+  </div>
+
+
+  
+
+</section>
 {% endblock %}

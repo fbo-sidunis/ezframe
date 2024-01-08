@@ -1,72 +1,88 @@
-{% extends 'cms/layout.html.twig' %}
+{% extends "cms/layout.html.twig" %}
 
 {% block include_additional_libs %}
   {# {{style("libs/jquery-ui-1.13.1/jquery-ui.min.css")}}
   {{script("libs/jquery-ui-1.13.1/jquery-ui.min.js") }} #}
-  {{ jsconst('DATATABLE_FR_PATH', asset('libs/datatables/datatable_fr.json')) }}
-  {{ style('libs/datatables/datatables.min.css') }}
-  {{ script('libs/datatables/datatables.min.js') }}
-  {{ script('helpers/js/SidunisDataTable.js') }}
-  {{ script('helpers/js/Form.js') }}
-  {{ script('helpers/js/BtnDelete.js') }}
-  {{ script('app/Cms/assets/js/layout_list.js') }}
+  {{jsconst("DATATABLE_FR_PATH",asset("libs/datatables/datatable_fr.json"))}}
+  {{style("libs/datatables/datatables.min.css")}}
+  {{script("libs/datatables/datatables.min.js")}}
+  {{script("helpers/js/SidunisDataTable.js")}}
+  {{script("helpers/js/Form.js")}}
+  {{script("helpers/js/BtnDelete.js")}}
+  {{script("app/Cms/assets/js/layout_list.js")}}
+
 {% endblock %}
 
 {% block body %}
-  <section class="row" id="layouts">
-    {# Liste #}
-    <div class="col-12 col-xxl-9 order-xxl-0">
-      <div class="default-block datatables-large" id="block_layouts">
-        <header>
-          <h2>layouts</h2>
-        </header>
 
-        <main>
-          <div class="d-flex justify-content-between align-items-center flex-wrap mb-5">
-            <button type="button" class="btn btn-secondary mt-2 mb-2 btn-addedit-layouts" id="btn_add_presta">+ Créer un nouveau layout</button>
-          </div>
-          {# Table layouts #}
-          <table id="table_layouts" class="float-none row-border">
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>Libelle</th>
-                <th>Template</th>
-                <th>Template pour le back</th>
-                <th>Nombre de contenu</th>
-                <th>Type</th>
-                <th></th>
-              </tr>
-            </thead>
-          </table>
+<section class="row" id="layouts">
 
-          {# Templates #}
-          {% template { id: 'layouts_template_statut' } %}
+  {# Liste #}
+  <div class="col-12 col-xxl-9 order-xxl-0">
+    <div class="default-block datatables-large" id="block_layouts">
+
+      <header>
+        <h2>layouts</h2>
+      </header>
+
+      <main>
+        <div class="d-flex justify-content-between align-items-center flex-wrap mb-5">
+          <button type="button" class="btn btn-secondary mt-2 mb-2 btn-addedit-layouts" id="btn_add_presta">
+            + Créer un nouveau layout
+          </button>
+        </div>
+        {# Table layouts #}
+        <table id="table_layouts" class="float-none row-border">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Libelle</th>
+              <th>Template</th>
+              <th>Template pour le back</th>
+              <th>Nombre de contenu</th>
+              <th>Type</th>
+              <th></th>
+            </tr>
+          </thead>
+        </table>
+
+        {# Templates #}
+        <script type="text/html" id="layouts_template_statut">
           {# Classes de statut : success (valide) / ongoing (en cours de création) / pending (en attente de validation) / error (expiré) #}
           <span class="bubble mx-auto ${CLASS}" data-toggle="tooltip" data-placement="top" title="${STATUT}"></span>
-          {% endtemplate %}
+        </script>
 
-          {% template { id: 'layouts_template_actions' } %}
+        <script type="text/html" id="layouts_template_actions">
           <div class="d-flex justify-content-end">${CONTENT}</div>
-          {% endtemplate %}
+        </script>
 
-          {% template { id: 'layouts_template_action_editer' } %}
-          <button class="action-btn btn-addedit-layouts btn btn-dark" data-id="${ID}" data-toggle="tooltip" title="${TOOLTIP}"><i class="fass fa-pen-to-square"></i></button>
-          {% endtemplate %}
-          {% template { id: 'layouts_template_action_suppr' } %}
-          <button type="button" class="action-btn btn-delete-layouts btn btn-light" data-id="${ID}" data-toggle="tooltip" title="${TOOLTIP}"><i class="fass fa-trash-can"></i></button>
-          {% endtemplate %}
+        <script type="text/html" id="layouts_template_action_editer">
+          <button class="action-btn btn-addedit-layouts btn btn-dark" data-id="${ID}" data-toggle="tooltip" title="${TOOLTIP}"> 
+            <i class="fa-solid fa-pen-to-square"></i>
+          </button>
+        </script>
+        <script type="text/html" id="layouts_template_action_suppr">
+          <button type="button" class="action-btn btn-delete-layouts btn btn-light" data-id="${ID}" data-toggle="tooltip" title="${TOOLTIP}">
+            <i class="fa-solid fa-trash-can"></i>
+          </button>
+        </script>
 
-          {# Clear pour tableau #}
-          <div class="clearfix"></div>
 
-          {# Pagination #}
-          <div id="layouts_pagination">
-            {% include 'cms/shared/pagination.html.twig' %}
-          </div>
-        </main>
-        {% include 'cms/layouts/modal/add_layout.html.twig' %}
-      </div>
+
+        {# Clear pour tableau #}
+        <div class="clearfix"></div>
+
+        {# Pagination #}
+        <div id="layouts_pagination">
+          {% include 'cms/shared/pagination.html.twig' %}
+        </div>
+      </main>
+      {% include "cms/layouts/modal/add_layout.html.twig" %}
     </div>
-  </section>
+  </div>
+
+
+  
+
+</section>
 {% endblock %}

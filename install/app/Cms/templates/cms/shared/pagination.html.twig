@@ -2,16 +2,14 @@
 <nav aria-label="pagination" class="d-flex justify-content-center pagination-nav">
   <ul class="pagination w-100 justify-content-between">
     <li class="page-item disabled">
-      <a class="page-link page-previous" href="javascript:void(0);" tabindex="-1"><span><i class="fass fa-chevron-left"></i> Précédent</span></a>
+      <a class="page-link page-previous" href="javascript:void(0);" tabindex="-1"><span><i class="fas fa-chevron-left"></i> Précédent</span></a>
     </li>
     <ul class="d-flex flex-row flex-nowrap numbers"></ul>
     <li class="page-item">
-      <a class="page-link page-next" href="javascript:void(0);"><span>Suivant <i class="fass fa-chevron-right"></i></span></a>
+      <a class="page-link page-next" href="javascript:void(0);"><span>Suivant <i class="fas fa-chevron-right"></i></span></a>
     </li>
   </ul>
 </nav>
-{% template { class: 'template-page' } %}
-<li class="page-item ${PAGE_ACTIVE}">
-  <a class="page-link" href="javascript:void(0);" data-page="${PAGE_NUMBER}">{{ '${PAGE_NUMBER_SHOWN}' }}</a>
-</li>
-{% endtemplate %}
+<script type="text/html" class="template-page">
+  <li class="page-item ${PAGE_ACTIVE}"><a class="page-link" href="javascript:void(0);" data-page="${PAGE_NUMBER}">${PAGE_NUMBER_SHOWN}</a></li>
+</script>

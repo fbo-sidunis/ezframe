@@ -8,7 +8,8 @@
 
 namespace App\EzTools\Controller;
 
-class DatabaseController extends \Core\Controller {
+class DatabaseController extends \Core\Controller
+{
 
   private $allowedIP = [
     "127.0.0.1", //local
@@ -17,14 +18,15 @@ class DatabaseController extends \Core\Controller {
     "192.168.111.26", //fbo vpn
     "10.85.70.15", //fbo vpn
     "86.236.70.152", //Tuan
-    
+
   ];
 
-  public function render() {
-    if (!in_array($_SERVER["REMOTE_ADDR"],$this->allowedIP)) exit;
+  public function render(): void
+  {
+    if (!in_array($_SERVER["REMOTE_ADDR"], $this->allowedIP)) exit;
     ini_set('display_errors', FALSE);
     include __DIR__ . "/../include/adminer.php";
-    echo "<link rel=\"stylesheet\" href=\"".relativePathUrl(__DIR__."/../include")."adminer.css\">".PHP_EOL;
+    echo "<link rel=\"stylesheet\" href=\"" . relativePathUrl(__DIR__ . "/../include") . "adminer.css\">" . PHP_EOL;
     exit;
   }
 }

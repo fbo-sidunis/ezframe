@@ -1,29 +1,34 @@
-<?php 
+<?php
 
 namespace App\Cms\Controller;
 
 use App\Cms\Controller;
 use App\Cms\Model\CmsLayouts;
 use App\Cms\Model\CmsPages;
+use Core\Response\HtmlResponse;
+use Core\Response\JsonResponse;
 use Helper\Datatable;
 use Helper\FormData;
 
-class LayoutController extends Controller {
+class LayoutController extends Controller
+{
 
   protected $template = "cms/layouts/layout_list.html.twig";
 
- 
+
   //--------------------------------------------------------------------//
   // VUES
   //--------------------------------------------------------------------//
 
-  public function render($datas = []) {
+  public function render($datas = []): HtmlResponse
+  {
     return $this->display($this->template);
   }
 
 
   #Route : cms_pages_ajax_list
-  public function list() {
+  public function list(): JsonResponse
+  {
     $filtres = [];
     $dt = new Datatable;
     $dt->setData(CmsLayouts::getListByFilters($dt->getQueryDatas(), $filtres));
@@ -32,7 +37,8 @@ class LayoutController extends Controller {
     return $dt->jsonResponse();
   }
 
-  public function delete(){
+  public function delete()
+  {
     $id = getRequest('id');
     if (!$id) {
       return errorResponse([], "id manquant", 404);
@@ -43,11 +49,11 @@ class LayoutController extends Controller {
 
     $HTML = CmsPages::removeBy($id);
     return successResponse($HTML, 'Layout supprimé');
-
   }
 
   #Route : cms_pages_ajax_save
-  public function save(){
+  public function save(): JsonResponse
+  {
     $formData = new FormData([
       "formName" => "layout",
       "association" => [
@@ -61,18 +67,18 @@ class LayoutController extends Controller {
     $returnData = [];
     $id = $formData->getId();
     $datas = $formData->getDatas();
-    
-    if($id){
+
+    if ($id) {
       if (!CmsLayouts::getBy($id)) {
         return errorResponse($id, "Layout introuvable", 404);
       }
-      $returnData["UPDATE_LAYOUT"] = CmsLayouts::updateBy($id,$datas);
-    }else{
+      $returnData["UPDATE_LAYOUT"] = CmsLayouts::updateBy($id, $datas);
+    } else {
       $datas["created_by"] = $this->user->getId() ?? 0;
       $id = CmsLayouts::add($datas);
       $returnData["INSERT_LAYOUT"] = $id;
     }
-  
+
     return successResponse($returnData, 'Layout enregistré');
   }
 }

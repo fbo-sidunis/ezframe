@@ -82,7 +82,7 @@ class Update extends \Core\CommandHandler
   {
     $this->logger = new Logger("update", [
       new RotatingFileHandler(
-        filename: ROOT_DIR . "logs/update/update.log",
+        filename: ROOT_DIR . "var/log/update/update.log",
         maxFiles: 3,
         level: Logger::DEBUG,
       ),

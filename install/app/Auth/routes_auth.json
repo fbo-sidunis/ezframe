@@ -1,27 +1,27 @@
 {
-  "/auth/": {
-    "alias": "authenticate",
-    "vars": {
-      "p": "auth:login:connexion"
-    }
-  },
-  "/login/": {
-    "alias": "login",
-    "vars": {
-      "p": "auth:login:render",
-      "t": "auth/login.html.twig"
-    }
-  },
-  "/logout/": {
-    "alias": "logout",
-    "vars": {
-      "p": "auth:login:logout"
-    }
-  },
-  "/password/forgotten/": {
-    "alias": "passwordForgotten",
-    "vars": {
-      "p": "auth:login:forgotPassword"
-    }
-  }
+	"/auth/": {
+		"alias": "authenticate",
+		"vars": {
+			"p": "auth:login:connexion"
+		}
+	},
+	"/login/": {
+		"alias": "login",
+		"vars": {
+			"p": "auth:login:render",
+			"t": "auth/login.html.twig"
+		}
+	},
+	"/logout/": {
+		"alias": "logout",
+		"vars": {
+			"p": "auth:login:logout"
+		}
+	},
+	"/password/forgotten/": {
+		"alias": "passwordForgotten",
+		"vars": {
+			"p": "auth:login:forgotPassword"
+		}
+	}
 }

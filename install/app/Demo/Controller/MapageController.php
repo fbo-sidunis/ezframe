@@ -10,8 +10,11 @@
 namespace App\Demo\Controller;
 
 use App\Demo\Model\Maclass;
+use Core\Response\HtmlResponse;
+use Core\Response\JsonResponse;
 
-class MapageController extends \Core\Controller {
+class MapageController extends \Core\Controller
+{
 
   protected $template = "demo/exemple.html.twig";
   protected $tmpl_ajax = "demo/reponse_ajax.html.twig";
@@ -21,7 +24,8 @@ class MapageController extends \Core\Controller {
   // VUES
   //--------------------------------------------------------------------//
 
-  public function render($datas = []) {
+  public function render($datas = []): HtmlResponse
+  {
 
     $this->datas['USERS'] = Maclass::getUsers();
 
@@ -33,7 +37,8 @@ class MapageController extends \Core\Controller {
    * @param type $datas
    * @return array
    */
-  public function ajax_Exemple($datas = []) {
+  public function ajax_Exemple($datas = []): JsonResponse
+  {
     $id = getPost('id');
     if (!$id) {
       return errorResponse($id, "id manquant", 404);
@@ -48,7 +53,8 @@ class MapageController extends \Core\Controller {
    * @param type $datas
    * @return array
    */
-  public function ajax_Exemple2($datas = []) {
+  public function ajax_Exemple2($datas = []): JsonResponse
+  {
     $id = getPost('id');
     if (!$id) {
       return errorResponse($id, "id manquant", 404);
@@ -58,5 +64,4 @@ class MapageController extends \Core\Controller {
     $HTML = $this->oTwig->render($this->tmpl_ajax, $datas);
     return successResponse($HTML, "Le user");
   }
-
 }

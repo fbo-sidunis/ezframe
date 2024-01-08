@@ -9,6 +9,7 @@
 namespace Core;
 
 use Core\Common\Site;
+use Core\Response\HtmlResponse;
 
 set_time_limit(1000);
 
@@ -17,7 +18,8 @@ set_time_limit(1000);
  *
  * @author jreynet
  */
-class Controller {
+class Controller
+{
 
   /**
    * L'objet twig Environnement
@@ -68,7 +70,8 @@ class Controller {
    * @param array $datas 
    * @return void 
    */
-  function __construct($datas = []) {
+  function __construct($datas = [])
+  {
     $this->user = User::retreive();
     $datas["USER"] = $this->user;
     $twigEnv = Site::getTwigEnvironnment();
@@ -96,41 +99,19 @@ class Controller {
   }
 
   /**
-   *
-   * @param type $obj
-   * @return type
-   */
-  public function getCurlResponseToArray($obj = NULL) {
-    if (!empty($obj)) {
-      if (is_array($obj) || is_object($obj)) {
-        $arr = (array) $obj;
-        if (is_object($arr)) {
-          return !empty($arr->response) ? (array) $arr->response : (array) $arr;
-        } else {
-          return !empty($arr['response']) ? (array) $arr['response'] : (array) $arr;
-        }
-      } else {
-        return $obj;
-      }
-    }
-  }
-
-  /**
    * Affichage de la page
    * @param type $template [chemin du template twig, se replius sur $this->template si null]
-   * @return boolean
+   * @return HtmlResponse
    */
-  public function display($template = null, $datas = []) {
+  public function display($template = null, $datas = [])
+  {
     $this->datas['template'][] = $this->template;
-    if ($this->twig) {
-      echo $this->twig->render($template ?: $this->template, $datas ?: $this->datas);
-      return true;
-    } else {
-      return "Template or loader error ";
-    }
+    $response = new HtmlResponse($template ?: $this->template, $datas ?: $this->datas);
+    return $response;
   }
 
-  protected function checkAccess($roles = null) {
+  protected function checkAccess($roles = null)
+  {
     $roles = $roles ?? $this->authorized;
     return $this->user && $this->user->hasOneRole($roles);
   }
@@ -138,11 +119,12 @@ class Controller {
   /**
    * Vérifie l'accès de l'utilisateur et echo une réponse d'erreur en JSON si accès refusé
    * @param mixed|null $roles 
-   * @return false|void 
+   * @return void 
    */
-  protected function checkAuthorizationJSON($roles = null) {
+  protected function checkAuthorizationJSON($roles = null)
+  {
     if (!$this->checkAccess($roles)) {
-      return \errorResponse(["roles" => $roles ?? $this->authorized], "Non autorisé", 401);
+      throw new Exception("Non autorisé");
     }
   }
 
@@ -153,20 +135,21 @@ class Controller {
    * @param array $variables [variables de route de fallback si besoin est]
    * @return mixed 
    */
-  protected function checkAuthorization($roles = null, $route = null, $variables = []) {
+  protected function checkAuthorization($roles = null, $route = null, $variables = [])
+  {
     if (!$this->checkAccess($roles)) {
       $url = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
-      if (empty($_COOKIE["redirect_url"])){
-        setcookie("redirect_url",$url,[
-          "expires" => time()+1200,
+      if (empty($_COOKIE["redirect_url"])) {
+        setcookie("redirect_url", $url, [
+          "expires" => time() + 1200,
           "path" => ROOT_URL,
           "domain" => $_SERVER["HTTP_HOST"],
           "secure" => true,
           "httponly" => true,
           "samesite" => "Lax",
         ]);
-      }else if ($url == $_COOKIE["redirect_url"]){
-        setcookie("redirect_url","",[
+      } else if ($url == $_COOKIE["redirect_url"]) {
+        setcookie("redirect_url", "", [
           "expires" => -1,
           "path" => ROOT_URL,
           "domain" => $_SERVER["HTTP_HOST"],
@@ -176,8 +159,8 @@ class Controller {
         ]);
       }
       return $this->route->redirect($route ?? $this->fallback, $variables);
-    }else{
-      setcookie("redirect_url","",[
+    } else {
+      setcookie("redirect_url", "", [
         "expires" => -1,
         "path" => ROOT_URL,
         "domain" => $_SERVER["HTTP_HOST"],
@@ -188,14 +171,16 @@ class Controller {
     }
   }
 
-  protected function setData($name,$value){
+  protected function setData(string $name, $value)
+  {
     $this->datas[$name] = $value;
     return $this;
   }
 
-  protected function getData($name){
+  protected function getData($name)
+  {
     return $this->datas[$name] ?? null;
   }
 
-//------------------ FIN CLASS /---------------------------//
+  //------------------ FIN CLASS /---------------------------//
 }

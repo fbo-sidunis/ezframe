@@ -101,7 +101,7 @@ class Db
     } catch (\Exception $e) {
       $logger = new Logger('db', [
         new \Monolog\Handler\RotatingFileHandler(
-          filename: ROOT_DIR . "logs/db/db.log",
+          filename: ROOT_DIR . "var/log/db/db.log",
           level: Logger::ERROR,
           maxFiles: 30,
         )

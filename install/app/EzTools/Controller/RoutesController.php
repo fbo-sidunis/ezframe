@@ -10,8 +10,11 @@
 namespace App\EzTools\Controller;
 
 use App\EzTools\Model\Routes;
+use Core\Response\HtmlResponse;
+use Core\Response\JsonResponse;
 
-class RoutesController extends \Core\Controller {
+class RoutesController extends \Core\Controller
+{
 
   protected $template = "admin/routes.html.twig";
 
@@ -20,7 +23,8 @@ class RoutesController extends \Core\Controller {
   // VUES
   //--------------------------------------------------------------------//
 
-  public function render($datas = []) {
+  public function render($datas = []): HtmlResponse
+  {
 
     $this->datas['modules'] = Routes::getModules();
 
@@ -33,7 +37,8 @@ class RoutesController extends \Core\Controller {
    * @param $_POST['alias']
    * @return array
    */
-  public function getRouteByAlias($datas = []) {
+  public function getRouteByAlias($datas = []): JsonResponse
+  {
     $alias = getPost('alias');
     if (!$alias)
       return errorResponse($alias, "Alias manquant", 404);
@@ -46,7 +51,8 @@ class RoutesController extends \Core\Controller {
    * 
    * @return type
    */
-  public function getAppControllers($datas = []) {
+  public function getAppControllers($datas = []): JsonResponse
+  {
     $app = getPost('app');
     $ctrl = Routes::getController($app);
     return successResponse($ctrl, "Controllers");
@@ -57,7 +63,8 @@ class RoutesController extends \Core\Controller {
    * @param type $datas
    * @return type
    */
-  public function getControllerFunctions($datas = []) {
+  public function getControllerFunctions($datas = []): JsonResponse
+  {
     $app = getPost('app');
     $ctrl = getPost('ctrl');
     $functions = Routes::getControllerFunctions($app, $ctrl);
@@ -69,7 +76,8 @@ class RoutesController extends \Core\Controller {
    * @param type $datas
    * @return type
    */
-  public function ajax_saveRoute($datas = []) {
+  public function ajax_saveRoute($datas = []): JsonResponse
+  {
     $returndatas = [];
     $url = getPost('url', "/");
     $oldUrl = getPost('oldurl', "/");
@@ -93,11 +101,11 @@ class RoutesController extends \Core\Controller {
    * @param type $datas
    * @return type
    */
-  public function ajax_deleteRoute($datas = []) {
+  public function ajax_deleteRoute($datas = []): JsonResponse
+  {
     $returndatas = [];
     $url = getPost('url', "/");
     $returndatas['DELETE'] = Routes::deleteRoute($url);
     return successResponse($returndatas, "deleteRoute");
   }
-
 }

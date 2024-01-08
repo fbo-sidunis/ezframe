@@ -1,0 +1,65 @@
+{% if xdebug == 2 %}
+	{% set xdtemplate = _self %}
+	{% include 'xdeb2.html.twig' %}
+{% endif %}
+<style>
+	*{ transition: all 0.6s; }
+
+	html { height: 100%; }
+
+	body{ font-family: 'Lato', sans-serif; color: #888; margin: 0; }
+
+	#main{ display: table; width: 100%; height: 100vh; text-align: center; }
+
+	.fof{ display: table-cell; vertical-align: middle; }
+
+	.fof h1{ font-size: 50px; display: inline-block; padding-right: 12px;
+	margin:unset; } .fof h2{ font-size: 30px; display: inline-block; margin:unset;
+	padding-right: 12px; animation: type .5s alternate infinite; }
+
+	@keyframes type{ from{box-shadow: inset -3px 0px 0px #888;} to{box-shadow:
+	inset -3px 0px 0px transparent;} }
+	table.backtrace {
+		margin: 0 auto;
+		border-collapse: collapse;
+	}
+	table.backtrace thead tr th,
+	table.backtrace tbody tr.trace td{
+		border: 1px solid #888;
+		padding: 2px;
+	}
+</style>
+<div id="main">
+	<div class="fof">
+		<h1>Erreur 500</h1><br />
+		{% if (DEBUG) %}
+			<h2>{{ message }} in {{ file }} on line {{ line }}</h2>
+			<table class="backtrace">
+				<thead>
+					<tr>
+						<th>#</th>
+						<th>File</th>
+						<th>Function</th>
+					</tr>
+				</thead>
+				<tbody>
+				{% for index,trace in backtrace %}
+					<tr class="trace">
+						<td>
+							{{ index }}
+						</td>
+						<td>
+							{{ trace.file}}
+						</td>
+						<td>
+							{{ trace.function}}
+						</td>
+					</tr>
+				{% endfor %}
+				</tbody>
+			</table>
+		{% else %}
+			<h2>Une erreur est survenue, veuillez contacter l'administrateur du site.</h2>
+		{% endif %}
+	</div>
+</div>

@@ -99,6 +99,7 @@ class Update extends \Core\CommandHandler
     $this->updateTo1_0();
     $this->updateTo1_5();
     $this->updateTo1_7();
+    $this->updateTo1_9();
     $this->logger->info("End update");
     $this->showFiles();
   }
@@ -158,5 +159,23 @@ class Update extends \Core\CommandHandler
     file_put_contents($composerFile, json_encode($composerConfig, JSON_PRETTY_PRINT));
     $this->modifyFile($composerFile);
     shell_exec("composer dump-autoload");
+  }
+
+  public function updateTo1_9()
+  {
+    //Déplacer le fichier
+    $filesOrigin = [
+      LIBRARY_DIR . "install/templates/500.html.twig" => ROOT_DIR . "templates/500.html.twig",
+    ];
+    foreach ($filesOrigin as $origin => $destination) {
+      if (!file_exists($origin)) {
+        continue;
+      }
+      if (file_exists($destination)) {
+        continue;
+      }
+      copy($origin, $destination);
+      $this->addFile($destination);
+    }
   }
 }

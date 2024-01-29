@@ -19,24 +19,43 @@ class HtmlResponse extends Response
     $this->setTemplatePath($templatePath);
   }
 
-  public function setDatas(array $datas = []): static
+  /**
+   * Set the value of datas
+   * @param array $datas 
+   * @return $this 
+   */
+  public function setDatas(array $datas = [])
   {
     $this->datas = $datas;
     return $this;
   }
 
-  public function setData(string $key, $value): static
+  /**
+   * Set the value of an item in datas
+   * @param string $key 
+   * @param mixed $value 
+   * @return $this 
+   */
+  public function setData(string $key, $value)
   {
     $this->datas[$key] = $value;
     return $this;
   }
 
-  public function setTemplatePath(string $templatePath): static
+  /**
+   * Get the value of templatePath
+   * @param string $templatePath 
+   * @return $this 
+   */
+  public function setTemplatePath(string $templatePath)
   {
     $this->templatePath = $templatePath;
     return $this;
   }
 
+  /**
+   * @inheritDoc
+   */
   public function display(): void
   {
     if (!$this->templatePath) {
@@ -48,6 +67,15 @@ class HtmlResponse extends Response
     return;
   }
 
+  /**
+   * Display an error response
+   * @param string $message 
+   * @param array $datas 
+   * @param array $backtrace 
+   * @param string $file 
+   * @param int $line 
+   * @return void 
+   */
   public static function displayErrorResponse(
     string $message = "An error occured",
     array $datas = [],

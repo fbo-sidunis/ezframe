@@ -64,7 +64,6 @@ class HtmlResponse extends Response
     $content = Site::getTwigEnvironnment()->render($this->templatePath, $this->datas);
     $this->setContent($content);
     parent::display();
-    return;
   }
 
   /**
@@ -89,6 +88,5 @@ class HtmlResponse extends Response
     $datas["line"] = $line;
     $errorMessage = new static("500.html.twig", $datas);
     $errorMessage->display();
-    return;
   }
 }

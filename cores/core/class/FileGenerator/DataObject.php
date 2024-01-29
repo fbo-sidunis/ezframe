@@ -103,7 +103,7 @@ class DataObject extends FileGenerator
     foreach ($table->getColumns() as $column) {
       if ($column->getName() != "id") {
         $pascalName = self::snakeCaseToPascalCase($column->getName());
-        $content[] = " * @method static set$pascalName(mixed \$value)";
+        $content[] = " * @method static set$pascalName(\$value)";
       }
     }
     $content[] = " */";

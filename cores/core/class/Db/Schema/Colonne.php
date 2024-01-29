@@ -51,9 +51,9 @@ class Colonne
   ];
   protected string $_name;
   protected string $_type;
-  protected mixed $_length = null;
-  protected mixed $_default = null;
-  protected mixed $_onUpdate = null;
+  protected $_length = null;
+  protected $_default = null;
+  protected $_onUpdate = null;
   protected ?string $_comment = null;
   protected bool $_null = false;
   protected bool $_autoIncrement = false;
@@ -71,15 +71,15 @@ class Colonne
    * Colonne à renommer
    * @var string|string[]|null
    */
-  protected mixed $_renameFrom = null;
+  protected $_renameFrom = null;
   protected ?Table $_table = null;
 
   public function __construct(
     string $name,
     string $type,
-    mixed $length = null,
-    mixed $default = null,
-    mixed $onUpdate = null,
+    $length = null,
+    $default = null,
+    $onUpdate = null,
     ?string $comment = null,
     bool $null = false,
     bool $autoIncrement = false,
@@ -92,7 +92,7 @@ class Colonne
     bool $cascadeOnDelete = false,
     bool $cascadeOnUpdate = false,
     ?array $enumValues = null,
-    mixed $renameFrom = null,
+    $renameFrom = null,
     ?Table $table = null
   ) {
     if (empty($name)) {
@@ -142,12 +142,12 @@ class Colonne
     return $this->_type;
   }
 
-  public function getLength(): mixed
+  public function getLength()
   {
     return $this->_length;
   }
 
-  public function getDefault(): mixed
+  public function getDefault()
   {
     return $this->_default;
   }
@@ -175,12 +175,12 @@ class Colonne
     return "'{$this->getDefault()}'";
   }
 
-  public function getOnUpdate(): mixed
+  public function getOnUpdate()
   {
     return $this->_onUpdate;
   }
 
-  public function getQuotedOnUpdate(): mixed
+  public function getQuotedOnUpdate()
   {
     if ($this->getOnUpdate() === null) {
       return 'NULL';
@@ -316,7 +316,7 @@ class Colonne
     return implode(',', $values);
   }
 
-  public function getRenameFrom(): mixed
+  public function getRenameFrom()
   {
     return $this->_renameFrom;
   }

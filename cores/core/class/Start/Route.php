@@ -107,7 +107,7 @@ class Route
 
   protected static function mergeRoutesIntoConfig(
     string $mod,
-    string $rpath,
+    string $rpath
   ) {
     $array = arrayFromJson($rpath);
     foreach ($array as $key => &$value) {

@@ -25,36 +25,74 @@ class JsonResponse extends Response
     $this->setFullResponse($fullResponse);
   }
 
+  /**
+   * Get the value of datas
+   * @return array 
+   */
   public function setDatas(array $datas = [])
   {
     $this->datas = $datas;
     return $this;
   }
 
+  /**
+   * Set the value of an item in datas
+   * @param string $key 
+   * @param mixed $value 
+   * @return $this 
+   */
+  public function setData(string $key, $value)
+  {
+    $this->datas[$key] = $value;
+    return $this;
+  }
+
+  /**
+   * Set the value of success
+   * @param bool $success 
+   * @return $this 
+   */
   public function setSuccess(bool $success)
   {
     $this->success = $success;
     return $this;
   }
 
+  /**
+   * Set the value of message
+   * @param string $message 
+   * @return $this 
+   */
   public function setMessage(string $message)
   {
     $this->message = $message;
     return $this;
   }
 
+  /**
+   * Set the value of fullResponse
+   * @param null|array $fullResponse 
+   * @return $this 
+   */
   public function setFullResponse(?array $fullResponse)
   {
     $this->fullResponse = $fullResponse;
     return $this;
   }
 
+  /**
+   * @inheritDoc
+   */
   public function setHeaders(): void
   {
     header("Content-Type: application/json; charset=utf-8");
     return;
   }
 
+  /**
+   * Mise en forme de la réponse
+   * @return array 
+   */
   public function toArray(): array
   {
     if ($this->fullResponse !== null) {
@@ -67,11 +105,18 @@ class JsonResponse extends Response
     ];
   }
 
+  /**
+   * Mise en forme de la réponse en JSON
+   * @return string 
+   */
   public function toString(): string
   {
     return json_encode($this->toArray());
   }
 
+  /**
+   * @inheritDoc
+   */
   public function display(): void
   {
     $this->setContent($this->toString());
@@ -79,6 +124,15 @@ class JsonResponse extends Response
     return;
   }
 
+  /**
+   * Display an error response
+   * @param string $message 
+   * @param array $datas 
+   * @param array $backtrace 
+   * @param string $file 
+   * @param int $line 
+   * @return void 
+   */
   public static function displayErrorResponse(string $message = "Error", array $datas = [], array $backtrace = [], $file = "", $line = 0): void
   {
     if (DEBUG) {

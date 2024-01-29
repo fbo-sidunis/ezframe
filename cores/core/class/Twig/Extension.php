@@ -339,7 +339,7 @@ class Extension extends AbstractExtension
    * @param mixed $defaultValue 
    * @return mixed 
    */
-  public function match_value(mixed $value, array $associativeArray, mixed $defaultValue = null)
+  public function match_value($value, array $associativeArray, $defaultValue = null)
   {
     return $associativeArray[$value] ?? $defaultValue;
   }

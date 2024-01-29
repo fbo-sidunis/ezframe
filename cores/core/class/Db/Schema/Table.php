@@ -21,7 +21,7 @@ class Table
   protected ?string $_engine = "InnoDB";
   protected ?string $_charset = "utf8mb4";
   protected ?string $_collation = "utf8mb4_unicode_ci";
-  protected mixed $_renameFrom = null;
+  protected $_renameFrom = null;
   protected ?Schema $_schema = null;
 
   public function __construct(
@@ -31,7 +31,7 @@ class Table
     ?string $engine = "InnoDB",
     ?string $charset = "utf8mb4",
     ?string $collation = "utf8mb4_unicode_ci",
-    mixed $renameFrom = null,
+    $renameFrom = null,
     ?Schema $schema = null
   ) {
     $this->_name = $name;
@@ -96,7 +96,7 @@ class Table
     return $this->_collation;
   }
 
-  public function getRenameFrom(): mixed
+  public function getRenameFrom()
   {
     return $this->_renameFrom;
   }
@@ -167,7 +167,7 @@ class Table
     return $this;
   }
 
-  public function setRenameFrom(mixed $renameFrom): self
+  public function setRenameFrom($renameFrom): self
   {
     $this->_renameFrom = $renameFrom;
     return $this;

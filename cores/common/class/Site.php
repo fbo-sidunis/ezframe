@@ -239,8 +239,19 @@ class Site
       $backtrace = [];
       $traceLength = count($e->getTrace());
       foreach ($e->getTrace() as $index => $trace) {
+        if (isset($trace['object']) && $trace['object'] instanceof \Twig\Template) {
+          $template = $trace['object'];
+          $name = $template->getSourceContext()->getPath();
+          $line = $template->getDebugInfo()[$backtrace[$index]['line'] ?? -1] ?? null;
+          $backtrace[strval($traceLength - $index)] = [
+            "file" => $name . ":" . $line,
+            "function" => $trace["function"] ?? null,
+          ];
+          continue;
+        }
+        if (!isset($trace["file"])) continue;
         $backtrace[strval($traceLength - $index)] = [
-          "file" => $trace["file"] . ":" . $trace["line"],
+          "file" => $trace["file"] . (!empty($trace["line"]) ? (":" . $trace["line"]) : ""),
           "function" => implode("::", array_filter([$trace["class"] ?? null, $trace["function"] ?? null])) . "(" . implode(", ", array_map(function ($arg) {
             return is_object($arg) ? get_class($arg) : json_encode($arg);
           }, $trace["args"] ?? [])) . ")",

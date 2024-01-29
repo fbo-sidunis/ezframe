@@ -62,6 +62,10 @@ class Db
     $this->cnx();
   }
 
+  /**
+   * Singleton
+   * @return Db
+   */
   public static function getDb()
   {
     self::$db = self::$db ?? new Db();
@@ -92,8 +96,10 @@ class Db
    * @param array|null $datas [Les datas]
    * @return void 
    */
-  private function db_query($sql, $datas = NULL)
-  {
+  private function db_query(
+    $sql,
+    $datas = NULL
+  ) {
     try {
       $this->prepare = $this->bdd->prepare($sql);
       $this->res = $this->prepare->execute($datas);
@@ -103,7 +109,7 @@ class Db
         new \Monolog\Handler\RotatingFileHandler(
           filename: ROOT_DIR . "var/log/db/db.log",
           level: Logger::ERROR,
-          maxFiles: 30,
+          maxFiles: 30
         )
       ]);
       // en cas d'erreur :

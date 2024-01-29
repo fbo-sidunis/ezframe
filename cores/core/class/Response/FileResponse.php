@@ -60,6 +60,9 @@ class FileResponse extends Response
     $this->setMimeType($mimeType);
   }
 
+  /**
+   * @inheritDoc
+   */
   public function setHeaders(): void
   {
     if ($this->forceDownload) {
@@ -81,6 +84,9 @@ class FileResponse extends Response
   }
 
 
+  /**
+   * @inheritDoc
+   */
   public function display(): void
   {
     if (!$this->filePath) {
@@ -94,11 +100,23 @@ class FileResponse extends Response
     return;
   }
 
-  public static function displayErrorResponse(string $message = "An error occured", array $datas = [], array $backtrace = [], $file = "", $line = 0): void
-  {
-    $response = new HtmlResponse(...func_get_args());
-    $response->display();
-    return;
+  /**
+   * Display an error response
+   * @param string $message 
+   * @param array $datas 
+   * @param array $backtrace 
+   * @param string $file 
+   * @param int $line 
+   * @return void 
+   */
+  public static function displayErrorResponse(
+    string $message = "An error occured",
+    array $datas = [],
+    array $backtrace = [],
+    $file = "",
+    $line = 0
+  ): void {
+    HtmlResponse::displayErrorResponse($message, $datas, $backtrace, $file, $line);
   }
 
   /**

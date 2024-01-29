@@ -13,7 +13,7 @@ class HtmlResponse extends Response
 
   public function __construct(
     string $templatePath,
-    array $datas = [],
+    array $datas = []
   ) {
     $this->setDatas($datas);
     $this->setTemplatePath($templatePath);
@@ -48,8 +48,13 @@ class HtmlResponse extends Response
     return;
   }
 
-  public static function displayErrorResponse(string $message = "An error occured", array $datas = [], array $backtrace = [], $file = "", $line = 0): void
-  {
+  public static function displayErrorResponse(
+    string $message = "An error occured",
+    array $datas = [],
+    array $backtrace = [],
+    $file = "",
+    $line = 0
+  ): void {
     $datas["message"] = $message;
     $datas["backtrace"] = $backtrace;
     $datas["file"] = $file;

@@ -13,23 +13,41 @@ class Response
     $this->content = $content;
   }
 
+  /**
+   * Get the value of content
+   * @return string 
+   */
   public function getContent(): string
   {
     return $this->content;
   }
 
-  public function setContent($content): static
+  /**
+   * Set the value of content
+   * @param mixed $content 
+   * @return $this 
+   */
+  public function setContent($content)
   {
     $this->content = $content;
     return $this;
   }
 
-  public function setErrorCode(int $errorCode): static
+  /**
+   * Set the value of errorCode
+   * @param int $errorCode 
+   * @return $this 
+   */
+  public function setErrorCode(int $errorCode)
   {
     $this->errorCode = $errorCode;
     return $this;
   }
 
+  /**
+   * Set headers
+   * @return void 
+   */
   public function setHeaders(): void
   {
     // dd(debug_backtrace());
@@ -37,6 +55,10 @@ class Response
     return;
   }
 
+  /**
+   * Display the response
+   * @return void 
+   */
   public function display(): void
   {
     http_response_code($this->errorCode);
@@ -45,8 +67,22 @@ class Response
     return;
   }
 
-  public static function displayErrorResponse(string $message = "An error occured", array $datas = [], array $backtrace = [], $file = "", $line = 0): void
-  {
+  /**
+   * Display an error response
+   * @param string $message 
+   * @param array $datas 
+   * @param array $backtrace 
+   * @param string $file 
+   * @param int $line 
+   * @return void 
+   */
+  public static function displayErrorResponse(
+    string $message = "An error occured",
+    array $datas = [],
+    array $backtrace = [],
+    $file = "",
+    $line = 0
+  ): void {
     $errorMessage = new static($message . " in " . $file . " on line " . $line . "<br>" . "Datas : <pre>" . print_r($datas, true) . "</pre>" . "<br>" . "Backtrace : <pre>" . print_r($backtrace, true) . "</pre>");
     $errorMessage->setErrorCode(500);
     $errorMessage->display();

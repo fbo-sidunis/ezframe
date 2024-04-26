@@ -407,7 +407,8 @@ class Table
       $elements[] = "  DROP INDEX " . $column["Key_name"];
     }
     foreach ($indexKeysToDrop as $key => $column) {
-      if ($this->getColumnByName($column["Column_name"])->getReferenceColumn() !== null) continue;
+      $existingColumn = $this->getColumnByName($column["Column_name"]);
+      if (!$existingColumn || $existingColumn->getReferenceColumn() !== null) continue;
       $elements[] = "  DROP INDEX " . $column["Key_name"];
     }
     foreach ($columnsToDrop as $key => $column) {

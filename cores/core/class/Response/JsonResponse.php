@@ -102,6 +102,7 @@ class JsonResponse extends Response
     }
     return [
       "success" => $this->success ? 1 : 0,
+      "result" => $this->result ? 1 : 0,
       "message" => $this->message,
       "datas" => $this->datas,
     ];
@@ -140,6 +141,7 @@ class JsonResponse extends Response
     if (DEBUG) {
       $response = [
         "success" => 0,
+        "result" => 0,
         "message" => $message,
         "datas" => $datas,
         "file" => $file,
@@ -149,6 +151,7 @@ class JsonResponse extends Response
     } else {
       $response = [
         "success" => 0,
+        "result" => 0,
         "message" => "Une erreur est survenue",
         "datas" => $datas,
       ];

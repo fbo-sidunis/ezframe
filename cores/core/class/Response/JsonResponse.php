@@ -12,6 +12,7 @@ class JsonResponse extends Response
   protected ?array $fullResponse = null;
   protected string $message = "";
   protected bool $success = true;
+  protected bool $result = true;
 
   public function __construct(
     array $datas = [],
@@ -55,6 +56,7 @@ class JsonResponse extends Response
   public function setSuccess(bool $success)
   {
     $this->success = $success;
+    $this->result = $success;
     return $this;
   }
 

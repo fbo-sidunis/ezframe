@@ -89,26 +89,57 @@ class Schema
   {
     $tables = $this->getTables();
     //We order the tables by dependencies, so that the foreign keys are created after the tables they depend on
-    usort($tables, function (Table $a, Table $b) {
-      $aDeps = $a->getDependencies();
-      if (empty($aDeps)) return -1;
-      $bDeps = $b->getDependencies();
-      if (empty($bDeps)) return 1;
-      $aName = $a->getName();
-      $bName = $b->getName();
-      $aDeps = array_map(function (Table $table) {
-        return $table->getName();
-      }, $aDeps);
-      $bDeps = array_map(function (Table $table) {
-        return $table->getName();
-      }, $bDeps);
-      if (in_array($aName, $bDeps)) return -1;
-      if (in_array($bName, $aDeps)) return 1;
-      return 0;
-    });
-    foreach ($tables as $table) {
+    $orderedTables = self::sortDeps($tables);
+    foreach ($orderedTables as $table) {
       $table->update();
     }
+  }
+
+  /**
+   * 
+   * @param Table[] $tables 
+   * @return  Table[]
+   * @throws Exception 
+   */
+  private static function sortDeps($tables)
+  {
+    $res = array();
+    $doneList = array();
+
+    // while not all tables are resolved:
+    while (count($tables) > count($res)) {
+      $doneSomething = false;
+
+      foreach ($tables as $tableIndex => $table) {
+        if (isset($doneList[$table->getName()])) {
+          // table already in resultset
+          continue;
+        }
+        $resolved = true;
+        $deps = $table->getDependencies();
+        $depsNames = array_map(function ($dep) {
+          return $dep->getName();
+        }, $deps);
+        foreach ($depsNames as $depName) {
+          if (!isset($doneList[$depName])) {
+            // there is a dependency that is not met:
+            $resolved = false;
+            break;
+          }
+        }
+        if ($resolved) {
+          //all dependencies are met:
+          $doneList[$table->getName()] = true;
+          $res[] = $table;
+          $doneSomething = true;
+        }
+      }
+      if (!$doneSomething) {
+        // we could not resolve anything this pass. Should be a bug
+        throw new Exception('Could not resolve dependencies');
+      }
+    }
+    return $res;
   }
 
   private function getContent(string $file): array

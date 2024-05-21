@@ -140,6 +140,7 @@ class SQLBuilder
   public function generatePlaceholdersAndValues($values, $prefix = ""): string
   {
     $placeholders = [];
+    $prefix = $prefix ?: uniqid();
     $values = array_values($values);
     foreach ($values as $key => $value) {
       $placeholder = ":" . $prefix . "_" . $key . "_";
@@ -190,14 +191,32 @@ class SQLBuilder
     return $this;
   }
 
+  /**
+   * @param string|string[] $condition 
+   * @return SQLBuilder 
+   */
   public function addColonne($colonne)
   {
     return $this->setColonnes(array_merge($this->getColonnes(), is_array($colonne) ? $colonne : [$colonne]));
   }
 
+  /**
+   * @param string|string[] $condition 
+   * @return SQLBuilder 
+   */
   public function addCondition($condition)
   {
     return $this->setConditions(array_merge($this->getConditions(), is_array($condition) ? $condition : [$condition]));
+  }
+
+  public function setFilters(array $filters)
+  {
+    return $this->setConditions([$this->handleFilter($filters)]);
+  }
+
+  public function addFilter(array $filter)
+  {
+    return $this->addCondition($this->handleFilter($filter));
   }
 
   public function addValue($value)
@@ -237,115 +256,16 @@ class SQLBuilder
     return $this;
   }
 
-  const EQUAL_OPERATOR = '$eq';
-  const NOT_EQUAL_OPERATOR = '$ne';
-  const IN_OPERATOR = '$in';
-  const NOT_IN_OPERATOR = '$nin';
-  const LIKE_OPERATOR = '$like';
-  const ALL_LIKE_OPERATOR = '$alllike';
-  const NOT_LIKE_OPERATOR = '$nlike';
-  const NOT_ALL_LIKE_OPERATOR = '$notalllike';
-  const GREATER_THAN_OPERATOR = '$gt';
-  const GREATER_THAN_OR_EQUAL_OPERATOR = '$gte';
-  const LESS_THAN_OPERATOR = '$lt';
-  const LESS_THAN_OR_EQUAL_OPERATOR = '$lte';
-  const IS_NULL_OPERATOR = '$null';
   public function handleGenericFilter(
     string $modelClass,
     string $name,
     $value
   ) {
     if (is_array($value)) {
-      $this->addGenericInFilter($modelClass, $name, $value);
-    } else if (is_string($value)) {
-      if (str_starts_with($value, self::EQUAL_OPERATOR)) {
-        $this->addGenericEqualFilter($modelClass, $name, substr($value, strlen(self::EQUAL_OPERATOR)));
-      } else if (str_starts_with($value, self::NOT_EQUAL_OPERATOR)) {
-        $this->addGenericEqualFilter($modelClass, $name, substr($value, strlen(self::NOT_EQUAL_OPERATOR)), true);
-      } else if (str_starts_with($value, self::IN_OPERATOR)) {
-        $this->addGenericInFilter($modelClass, $name, substr($value, strlen(self::IN_OPERATOR)));
-      } else if (str_starts_with($value, self::NOT_IN_OPERATOR)) {
-        $this->addGenericInFilter($modelClass, $name, substr($value, strlen(self::NOT_IN_OPERATOR)), true);
-      } else if (str_starts_with($value, self::LIKE_OPERATOR)) {
-        $this->addGenericLikeFilter($modelClass, $name, substr($value, strlen(self::LIKE_OPERATOR)));
-      } else if (str_starts_with($value, self::NOT_LIKE_OPERATOR)) {
-        $this->addGenericLikeFilter($modelClass, $name, substr($value, strlen(self::NOT_LIKE_OPERATOR)), true);
-      } else if (str_starts_with($value, self::ALL_LIKE_OPERATOR)) {
-        $this->addGenericLikeFilter($modelClass, $name, substr($value, strlen(self::ALL_LIKE_OPERATOR)), false, false);
-      } else if (str_starts_with($value, self::NOT_ALL_LIKE_OPERATOR)) {
-        $this->addGenericLikeFilter($modelClass, $name, substr($value, strlen(self::NOT_ALL_LIKE_OPERATOR)), true, false);
-      } else if (str_starts_with($value, self::GREATER_THAN_OPERATOR)) {
-        $this->addGenericComparisonFilter($modelClass, $name, substr($value, strlen(self::GREATER_THAN_OPERATOR)), ">");
-      } else if (str_starts_with($value, self::GREATER_THAN_OR_EQUAL_OPERATOR)) {
-        $this->addGenericComparisonFilter($modelClass, $name, substr($value, strlen(self::GREATER_THAN_OR_EQUAL_OPERATOR)), ">=");
-      } else if (str_starts_with($value, self::LESS_THAN_OPERATOR)) {
-        $this->addGenericComparisonFilter($modelClass, $name, substr($value, strlen(self::LESS_THAN_OPERATOR)), "<");
-      } else if (str_starts_with($value, self::LESS_THAN_OR_EQUAL_OPERATOR)) {
-        $this->addGenericComparisonFilter($modelClass, $name, substr($value, strlen(self::LESS_THAN_OR_EQUAL_OPERATOR)), "<=");
-      } else if (str_starts_with($value, self::IS_NULL_OPERATOR)) {
-        $this->addGenericIsNullFilter($modelClass, $name, $value);
-      } else {
-        $this->addGenericInFilter($modelClass, $name, $value);
-      }
-    } else {
-      $this->addGenericEqualFilter($modelClass, $name, $value);
+      $this->addFilter([$modelClass::al($name) => ['$in' => $value]]);
+      return;
     }
-  }
-
-  public function addGenericEqualFilter(
-    string $modelClass,
-    string $name,
-    $value
-  ) {
-    $this->addCondition($modelClass::al($name) . " = :$name");
-    $this->addValue([":$name" => $value]);
-  }
-
-  public function addGenericInFilter(
-    string $modelClass,
-    string $name,
-    $value,
-    bool $not = false
-  ) {
-    $this->addCondition($modelClass::al($name) . ($not ? " NOT" : "") . " IN (" . $this->generatePlaceholdersAndValues($value, $name) . ")");
-  }
-
-  public function addGenericLikeFilter(
-    string $modelClass,
-    string $name,
-    $value,
-    bool $not = false,
-    bool $or = false
-  ) {
-    if (is_array($value)) {
-      $conditions = [];
-      foreach ($value as $val) {
-        $conditions[] = $modelClass::al($name) . ($not ? " NOT" : "") . " LIKE :$name";
-        $this->addValue([":$name" => $val]);
-      }
-      $this->addCondition("(" . implode($or ? " OR " : " AND ", $conditions) . ")");
-    } else {
-      $this->addCondition($modelClass::al($name) . ($not ? " NOT" : "") . " LIKE :$name");
-      $this->addValue([":$name" => $value]);
-    }
-  }
-
-  public function addGenericComparisonFilter(
-    string $modelClass,
-    string $name,
-    $value,
-    string $operator,
-  ) {
-    $this->addCondition($modelClass::al($name) . " $operator :$name");
-    $this->addValue([":$name" => $value]);
-  }
-
-  public function addGenericIsNullFilter(
-    string $modelClass,
-    string $name,
-    bool $not,
-  ) {
-    $this->addCondition($modelClass::al($name) . " IS" . ($not ? " NOT" : "") . " NULL");
+    $this->addFilter([$modelClass::al($name) => $value]);
   }
 
   public function addGroupBy($groupBy)
@@ -407,5 +327,90 @@ class SQLBuilder
     $this->sql .= $order ? $order . PHP_EOL : "";
     $this->sql .= $limit ? $limit . PHP_EOL : "";
     return $this->getSql();
+  }
+
+  const OPERATORS_GROUP = [
+    '$or',
+    '$and',
+    '$not',
+  ];
+
+  const OPERATORS_VALUE = [
+    '$in',
+    '$eq',
+    '$isnull',
+    '$like',
+    '$gt',
+    '$gte',
+    '$lt',
+    '$lte',
+  ];
+
+  public function handleFilter($filter)
+  {
+    if (empty($filter)) {
+      return null;
+    }
+    if (is_string($filter)) {
+      return $filter;
+    }
+    if (is_array($filter)) {
+      $key = array_key_first($filter);
+      $value = $filter[$key];
+      if (!in_array($key, self::OPERATORS_GROUP)) {
+        $key = '$and';
+        $value = [$filter];
+      }
+    }
+    switch ($key) {
+      case '$or':
+        return "(" . implode(" OR ", array_map(fn ($v) => $this->handleFilter($v), $value)) . ")";
+      case 0:
+        $value = $filter;
+      case '$and':
+        return "(" . implode(" AND ", array_map(fn ($v) => $this->handleFilter($v), $value)) . ")";
+      case '$not':
+        return "(NOT (" . $this->handleFilter($value) . "))";
+      default:
+        return $this->handleFilterValue($key, $value);
+    }
+  }
+
+  protected int $countValues = 0;
+
+  public function instanceValue($value)
+  {
+    $this->countValues++;
+    $key = ":value_" . $this->countValues . "_";
+    $this->addValue([$key => $value]);
+    return $key;
+  }
+
+  public function handleFilterValue($key, $value, $noQuoting = true)
+  {
+    $value = is_array($value) ? $value : ['$eq' => $value];
+    $operator = array_key_first($value);
+    $value = $value[$operator];
+    $quote = function ($v) use ($noQuoting) {
+      return $noQuoting ? $v : Db::quoteIdentifier($v);
+    };
+    switch ($operator) {
+      case '$in':
+        return $quote($key) . ' IN (' . implode(',', array_map(fn ($v) => $this->instanceValue($v), $value)) . ')';
+      case '$eq':
+        return $quote($key) . ' = ' . $this->instanceValue($value);
+      case '$like':
+        return $quote($key) . ' LIKE ' . $this->instanceValue($value);
+      case '$gt':
+        return $quote($key) . ' > ' . $this->instanceValue($value);
+      case '$gte':
+        return $quote($key) . ' >= ' . $this->instanceValue($value);
+      case '$lt':
+        return $quote($key) . ' < ' . $this->instanceValue($value);
+      case '$lte':
+        return $quote($key) . ' <= ' . $this->instanceValue($value);
+      case '$isnull':
+        return $quote($key) . ' IS ' . (!$value ? 'NOT ' : '') . 'NULL';
+    }
   }
 }

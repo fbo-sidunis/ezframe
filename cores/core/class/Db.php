@@ -474,7 +474,7 @@ class Db
     return self::db_all($sql, $datas);
   }
 
-  protected static function quoteIdentifier($str)
+  public static function quoteIdentifier($str)
   {
     $str = trim($str);
     if ($str == "*") {

@@ -262,6 +262,13 @@ class SQLBuilder
     $value
   ) {
     if (is_array($value)) {
+      if (in_array(array_key_first($value), self::OPERATORS_GROUP)) {
+        throw new Exception("Invalid filter");
+      }
+      if (in_array(array_key_first($value), self::OPERATORS_VALUE)) {
+        $this->addFilter([$modelClass::al($name) => $value]);
+        return;
+      }
       $this->addFilter([$modelClass::al($name) => ['$in' => $value]]);
       return;
     }
@@ -337,9 +344,12 @@ class SQLBuilder
 
   const OPERATORS_VALUE = [
     '$in',
+    '$nin', // 'NOT IN'
     '$eq',
+    '$neq', // '!='
     '$isnull',
     '$like',
+    '$nlike', // 'NOT LIKE'
     '$gt',
     '$gte',
     '$lt',
@@ -354,20 +364,20 @@ class SQLBuilder
     if (is_string($filter)) {
       return $filter;
     }
-    if (is_array($filter)) {
-      $key = array_key_first($filter);
-      $value = $filter[$key];
-      if (!in_array($key, self::OPERATORS_GROUP)) {
-        $key = '$and';
-        $value = [$filter];
-      }
-    }
+    $key = array_key_first($filter);
+    $value = $filter[$key];
     switch ($key) {
       case '$or':
+        if (is_array($value) && array_key_first($value) != 0) {
+          throw new Exception("Invalid OR filter, must be this format: ['\$or' => [['key1' => 'value1'], ['key2' => 'value2']]], not this format: ['\$or' => ['key1' => 'value1', 'key2' => 'value2']]");
+        }
         return "(" . implode(" OR ", array_map(fn ($v) => $this->handleFilter($v), $value)) . ")";
       case 0:
         $value = $filter;
       case '$and':
+        if (is_array($value) && array_key_first($value) != 0) {
+          throw new Exception("Invalid AND filter, must be this format: ['\$and' => [['key1' => 'value1'], ['key2' => 'value2']]], not this format: ['\$and' => ['key1' => 'value1', 'key2' => 'value2']]");
+        }
         return "(" . implode(" AND ", array_map(fn ($v) => $this->handleFilter($v), $value)) . ")";
       case '$not':
         return "(NOT (" . $this->handleFilter($value) . "))";
@@ -397,10 +407,16 @@ class SQLBuilder
     switch ($operator) {
       case '$in':
         return $quote($key) . ' IN (' . implode(',', array_map(fn ($v) => $this->instanceValue($v), $value)) . ')';
+      case '$nin':
+        return $quote($key) . ' NOT IN (' . implode(',', array_map(fn ($v) => $this->instanceValue($v), $value)) . ')';
       case '$eq':
         return $quote($key) . ' = ' . $this->instanceValue($value);
+      case '$neq':
+        return $quote($key) . ' != ' . $this->instanceValue($value);
       case '$like':
         return $quote($key) . ' LIKE ' . $this->instanceValue($value);
+      case '$nlike':
+        return $quote($key) . ' NOT LIKE ' . $this->instanceValue($value);
       case '$gt':
         return $quote($key) . ' > ' . $this->instanceValue($value);
       case '$gte':

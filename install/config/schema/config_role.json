@@ -1,41 +1,35 @@
 {
-  "name": "config_role",
-  "columns": [
-    {
-      "name": "code",
-      "type": "VARCHAR",
-      "length": 32,
-      "null": false,
-      "comment": "Code du rôle",
-      "index": true
-    },
-    {
-      "name": "libelle",
-      "type": "VARCHAR",
-      "length": 50,
-      "null": true,
-      "comment": "Libellé du rôle"
-    },
-    {
-      "name": "defaut",
-      "type": "ENUM",
-      "enumValues": [
-        "Y",
-        "N"
-      ],
-      "null": true,
-      "comment": "Rôle par défaut"
-    },
-    {
-      "name": "actif",
-      "type": "ENUM",
-      "enumValues": [
-        "Y",
-        "N"
-      ],
-      "null": true,
-      "comment": "Rôle actif"
-    }
-  ],
-  "comment": "Table des rôles"
+	"name": "config_role",
+	"columns": [
+		{
+			"name": "code",
+			"type": "VARCHAR",
+			"length": 32,
+			"null": false,
+			"comment": "Code du rôle",
+			"primary": true
+		},
+		{
+			"name": "libelle",
+			"type": "VARCHAR",
+			"length": 50,
+			"null": true,
+			"comment": "Libellé du rôle"
+		},
+		{
+			"name": "defaut",
+			"type": "ENUM",
+			"enumValues": ["Y", "N"],
+			"null": true,
+			"comment": "Rôle par défaut"
+		},
+		{
+			"name": "actif",
+			"type": "ENUM",
+			"enumValues": ["Y", "N"],
+			"null": true,
+			"comment": "Rôle actif"
+		}
+	],
+	"comment": "Table des rôles"
 }

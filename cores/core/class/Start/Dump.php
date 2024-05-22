@@ -15,13 +15,13 @@ class Dump
   {
     self::$cloner = new VarCloner();
     self::$dumper = 'cli' === PHP_SAPI ? new CliDumper() : new HtmlDumper();
-    VarDumper::setHandler(function ($var, ...$moreVars) {
+    VarDumper::setHandler(function (...$vars) {
       $backtrace = debug_backtrace(\DEBUG_BACKTRACE_PROVIDE_OBJECT | \DEBUG_BACKTRACE_IGNORE_ARGS, 9);
-      self::dump($backtrace, self::$dumper, $var, ...$moreVars);
+      self::dump($backtrace, self::$dumper, ...$vars);
     });
   }
 
-  public static function dump($backtrace, $dumper, $var, ...$moreVars)
+  public static function dump($backtrace, $dumper, ...$vars)
   {
     $name = $backtrace[2]["file"];
     $line = $backtrace[2]["line"];
@@ -39,22 +39,26 @@ class Dump
       $line = $template->getDebugInfo()[$backtrace[$key_]['line'] ?? -1] ?? null;
     }
     $dumper->setLine($name, $line);
-
-    $dumper->dump(self::$cloner->cloneVar($var));
-    foreach ($moreVars as $v) {
-      $dumper->dump(self::$cloner->cloneVar($v));
+    if (count($vars) > 1) {
+      $dumper->dump(self::$cloner->cloneVar($vars[0]));
+      return $vars[0];
+    } else {
+      foreach ($vars as $var) {
+        $dumper->dump(self::$cloner->cloneVar($var));
+      }
+      return $vars;
     }
   }
 
-  public static function dumpHtml($var, ...$moreVars)
+  public static function dumpHtml(...$vars)
   {
     $backtrace = debug_backtrace(\DEBUG_BACKTRACE_PROVIDE_OBJECT | \DEBUG_BACKTRACE_IGNORE_ARGS, 9);
-    self::dump($backtrace, new HtmlDumper(), $var, ...$moreVars);
+    return self::dump($backtrace, new HtmlDumper(), ...$vars);
   }
 
-  public static function dumpCli($var, ...$moreVars)
+  public static function dumpCli(...$vars)
   {
     $backtrace = debug_backtrace(\DEBUG_BACKTRACE_PROVIDE_OBJECT | \DEBUG_BACKTRACE_IGNORE_ARGS, 9);
-    self::dump($backtrace, new CliDumper(), $var, ...$moreVars);
+    return self::dump($backtrace, new CliDumper(), ...$vars);
   }
 }

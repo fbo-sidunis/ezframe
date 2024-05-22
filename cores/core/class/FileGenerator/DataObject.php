@@ -140,7 +140,8 @@ class DataObject extends FileGenerator
     $className = self::snakeCaseToPascalCase($colonne->getTable()->getName());
     $getterName = "get$className" . "Objects";
     $preloadName = "preload$className" . "Objects";
-    $content[] = "\tpublic function $getterName(): array";
+    $content[] = "\t/** @return {$className}[] */";
+    $content[] = "\tpublic function {$getterName}(): array";
     $content[] = "\t{";
     $content[] = "\t\treturn self::_getClass()::getByFilters([\"{$colonne->getName()}\" => \$this->getData(\"{$colonne->getReferenceColumn()}\")]);";
     $content[] = "\t}";

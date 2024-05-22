@@ -1,155 +1,340 @@
 <?php
 
-namespace Core\FileGenerator;
+namespace Core;
 
-use Core\Db\Schema;
-use Core\Db\Schema\Colonne;
-use Core\Db\Schema\Table;
+use Core\User;
 use Core\Exception;
-use Core\FileGenerator;
+use JsonSerializable;
 
-class DataObject extends FileGenerator
+class DataObject implements JsonSerializable
 {
 
-  protected const PATH = ROOT_DIR . '/model/DataObject/';
+  protected static array $_objects = [];
+  protected static string $_modelClass;
+  protected array $origDatas = [];
+  protected int|string|null $_id;
 
-  public static function generateFiles()
+  /**
+   * @param array $datas 
+   * @return void 
+   * @throws Exception 
+   */
+  function __construct(
+    protected array $datas
+  ) {
+    if (!isset(static::$_modelClass)) {
+      throw new Exception("Model class not defined");
+    }
+    $this->setId($datas[static::_getModelClass()::$pkey] ?? null);
+    if ($this->getId()) {
+      static::$_objects[$this->getId()] = $this;
+    }
+  }
+
+  /** @return void  */
+  function __destruct()
   {
-    $schema = self::getSchema();
-    $tables = $schema->getTables();
-    foreach ($tables as $table) {
-      try {
-        self::generateFileContent($table, $schema);
-      } catch (Exception $e) {
-        echo "Erreur lors de la génération du dataObject de la table {$table->getName()} : " . $e->getMessage() . PHP_EOL;
-      }
+    if ($this->_id) {
+      unset(static::$_objects[$this->_id]);
     }
   }
 
-  protected static function generateFileContent(
-    Table $table,
-    Schema $schema
-  ) {
-    $tableName = $table->getName();
-    $className = self::snakeCaseToPascalCase($tableName);
-    $fileFullPath = self::PATH . $className . '.php';
-    if (file_exists($fileFullPath)) {
-      unlink($fileFullPath);
-    }
-    $primaryKeys = $table->getPrimaryKeys();
-    if (count($primaryKeys) < 1) {
-      throw new Exception("La table $tableName n'a pas de clé primaire");
-    }
-    if (count($primaryKeys) > 1) {
-      throw new Exception("La génération de modèle ne supporte pas les clés primaires multiples (table $tableName)");
-    }
-    $dependances = $table->getDependencies();
-    $dependingTables = $table->getDependingTables();
-    $tablesNames = array_merge(
-      array_map(fn ($table) => $table->getName(), $dependances),
-      array_map(fn ($table) => $table->getName(), $dependingTables)
-    );
-    sort($tablesNames);
-
-
-    $modelClassName = $className . "Model";
-    $content = [];
-    $content[] = "namespace Model\DataObject;";
-    $content[] = "";
-    $content[] = "use Core\DataObject;";
-    $content[] = "use Core\Exception;";
-    $content[] = "use Model\\$className as $modelClassName;";
-    foreach ($tablesNames as $tableName) {
-      $content[] = "use Model\\DataObject\\" . self::snakeCaseToPascalCase($tableName) . ";";
-    }
-    $content[] = "";
-    self::addMethodsDoc($table, $content);
-    $content[] = "class $className extends DataObject";
-    $content[] = "{";
-    $content[] = "\tprotected static array \$_objects = [];";
-    $content[] = "\tprotected static string \$_modelClass = $modelClassName::class;";
-    foreach ($dependances as $dependance) {
-      $className = self::snakeCaseToPascalCase($dependance->getName());
-      $varName = "\$_" . self::snakeCaseToCamelCase($dependance->getName());
-      $content[] = "\tprotected static ?$className $varName = null;";
-      $content[] = "\t";
-    }
-    $content[] = "\t";
-    foreach (array_filter($table->getColumns(), fn ($column) => $column->getReferenceTable()) as $colonne) {
-      self::addReferenceTableGetterAndSetter($colonne, $content);
-      $content[] = "\t";
-    }
-    foreach ($dependingTables as $dependingTable) {
-      foreach (array_filter($dependingTable->getColumns(), fn ($column) => $column->getReferenceTable() === $table->getName()) as $column) {
-        self::addDependingTableGetter($table, $column, $content);
-        $content[] = "\t";
-      }
-    }
-    $content[] = "}";
-    self::putInFile($fileFullPath, $content);
+  /**
+   * Récupère l'identifiant de l'objet
+   */
+  public function getId()
+  {
+    return $this->_id;
   }
 
-  protected static function addMethodsDoc(
-    Table $table,
-    array &$content
-  ) {
-    $content[] = "/**";
-    foreach ($table->getColumns() as $column) {
-      if ($column->getName() != "id") {
-        $pascalName = self::snakeCaseToPascalCase($column->getName());
-        $content[] = " * @method mixed get$pascalName()";
-      }
-    }
-    foreach ($table->getColumns() as $column) {
-      if ($column->getName() != "id") {
-        $pascalName = self::snakeCaseToPascalCase($column->getName());
-        $content[] = " * @method static set$pascalName(\$value)";
-      }
-    }
-    $content[] = " */";
+  protected function setId($id)
+  {
+    $this->_id = $id;
   }
 
-  protected static function addReferenceTableGetterAndSetter(
-    Colonne $colonne,
-    array &$content
-  ) {
-    $className = self::snakeCaseToPascalCase($colonne->getReferenceTable());
-    $varName = "\$this->_" . self::snakeCaseToCamelCase($colonne->getReferenceTable());
-    $getterName = "get$className" . "Object";
-    $setterName = "set$className" . "Object";
-    $content[] = "\tpublic function $getterName(): ?$className";
-    $content[] = "\t{";
-    $content[] = "\t\tif (!{$varName} || {$varName}->getData(\"{$colonne->getReferenceColumn()}\") != \$this->getData(\"{$colonne->getName()}\")) {";
-    $content[] = "\t\t\t{$varName} = self::_getClass()::getOneByFilters([\"{$colonne->getReferenceColumn()}\" => \$this->getData(\"{$colonne->getName()}\")]);";
-    $content[] = "\t\t}";
-    $content[] = "\t\treturn {$varName};";
-    $content[] = "\t}";
-    $content[] = "\t";
-    $content[] = "\tpublic function $setterName(?{$className} \$value): static";
-    $content[] = "\t{";
-    $content[] = "\t\t\$this->setData(\"{$colonne->getName()}\", \$value ? \$value->getId() : null);";
-    $content[] = "\t\treturn \$this;";
-    $content[] = "\t}";
+  /**
+   * @param string $key 
+   * @return mixed 
+   */
+  public function getData(string $key)
+  {
+    return $this->datas[$key] ?? null;
   }
 
-  protected static function addDependingTableGetter(
-    Table $table,
-    Colonne $colonne,
-    array &$content
-  ) {
-    $className = self::snakeCaseToPascalCase($colonne->getTable()->getName());
-    $getterName = "get$className" . "Objects";
-    $preloadName = "preload$className" . "Objects";
-    $content[] = "\t/** @return {$className}[] */";
-    $content[] = "\tpublic function {$getterName}(): array";
-    $content[] = "\t{";
-    $content[] = "\t\treturn self::_getClass()::getByFilters([\"{$colonne->getName()}\" => \$this->getData(\"{$colonne->getReferenceColumn()}\")]);";
-    $content[] = "\t}";
-    $content[] = "\t";
-    $content[] = "\tpublic static function $preloadName(): void";
-    $content[] = "\t{";
-    $content[] = "\t\t\$values = array_map(function(\$object){return \$object->getData(\"{$colonne->getReferenceColumn()}\");}, self::\$_objects);";
-    $content[] = "\t\tself::_getClass()::preloadByFilters([\"{$colonne->getName()}\" => \$values]);";
-    $content[] = "\t}";
+  /**
+   * @param string $key 
+   * @return mixed 
+   */
+  public function getOrigData(string $key)
+  {
+    return $this->origDatas[$key] ?? $this->datas[$key] ?? null;
+  }
+
+  /** @return array  */
+  public function getDatas(): array
+  {
+    return $this->datas;
+  }
+
+  /** @return array  */
+  public function getOrigDatas(): array
+  {
+    return array_merge($this->datas, $this->origDatas);
+  }
+
+  /**
+   * @param string $key 
+   * @param mixed $value 
+   * @return $this 
+   */
+  public function setData(string $key, $value)
+  {
+    $origData = $this->origDatas[$key] ?? null;
+    if ($origData === $value) {
+      if (isset($this->origDatas[$key])) {
+        unset($this->origDatas[$key]);
+      }
+    } else if (!isset($this->origDatas[$key])) {
+      $this->origDatas[$key] = $this->datas[$key] ?? null;
+    }
+    $this->datas[$key] = $value;
+    return $this;
+  }
+
+  /**
+   * @param array $datas 
+   * @return $this 
+   */
+  public function setDatas(array $datas)
+  {
+    foreach ($datas as $key => $value) {
+      $this->setData($key, $value);
+    }
+    return $this;
+  }
+
+  /** @return $this  */
+  public function save($noclean = false)
+  {
+    $modelClass = static::_getModelClass();
+    if ($this->getId()) {
+      $modelClass::updateBy($this->getId(), $noclean ? $this->getDatas() : $this->getCleanDatas());
+      $this->setDatas($modelClass::getBy($this->getId()));
+    } else {
+      $this->setDatas($modelClass::create($this->datas));
+      $this->setId($this->getData($modelClass::$pkey));
+      static::$_objects[$this->getId()] = $this;
+    }
+    $this->origDatas = $this->datas;
+    return $this;
+  }
+
+  /** @return array  */
+  public function getCleanDatas()
+  {
+    $cleanDatas = [];
+    $columnsToRemove = [
+      "created_at",
+      "lastupdate_date",
+    ];
+    foreach ($this->datas as $key => $value) {
+      if (!in_array($key, $columnsToRemove)) {
+        $cleanDatas[$key] = $value;
+      }
+    }
+    return $cleanDatas;
+  }
+
+  /** @return void  */
+  public function delete()
+  {
+    if ($this->_id) {
+      static::_getModelClass()::removeBy($this->getId());
+      unset(static::$_objects[$this->_id]);
+      $this->_id = null;
+    }
+  }
+
+  /**
+   * @param int|string $id 
+   * @return null|static 
+   */
+  public static function getById(int|string $id): null|static
+  {
+    if (isset(static::$_objects[$id])) return static::$_objects[$id];
+    $datas = static::_getModelClass()::getBy($id);
+    if (!$datas) return null;
+    return new static($datas);
+  }
+
+
+  /**
+   * Récupère une liste d'objets selon les filtres
+   * @param array $ids 
+   * @return static[] 
+   */
+  public static function getListByIds(array $ids)
+  {
+    if (!$ids) {
+      return [];
+    }
+    static::preloadByIds($ids);
+    $func_ids = function ($id) use (&$ids) {
+      return in_array($id, $ids);
+    };
+    $res = array_filter(static::$_objects, $func_ids, ARRAY_FILTER_USE_KEY);
+    //we sort the resulting array to keep the same order as the ids array
+    $res = array_replace(array_flip($ids), $res);
+    return $res;
+  }
+
+  /**
+   * @return static[]
+   */
+  public static function getList($force = false)
+  {
+    if ($force) {
+      static::preloadAll();
+    }
+    return static::$_objects;
+  }
+
+  /**
+   * Récupère une liste d'objets selon les filtres
+   * @param array $ids 
+   * @return static[] 
+   */
+  public static function preloadByIds(array $ids)
+  {
+    $objects = [];
+    $idsLoaded = static::$_objects ? array_keys(static::$_objects) : [];
+    $idsToLoad = array_diff($ids, $idsLoaded);
+    $modelClass = static::_getModelClass();
+    $entries = $idsToLoad ? $modelClass::getAllBy($idsToLoad) : [];
+    foreach ($entries as $entry) {
+      $objects[$entry[$modelClass::$pkey]] = new static($entry);
+    }
+  }
+
+  public static function preloadByFilters(
+    array $filters = [],
+  ): void {
+    $modelClass = static::_getModelClass();
+    if (!method_exists($modelClass, "getByFilters")) {
+      throw new Exception("Model class " . $modelClass . " does not have a getByFilters method");
+    }
+    $ids = $modelClass::getByFilters([], $filters, "ids");
+    if (!$ids) return;
+    static::preloadByIds($ids);
+  }
+
+  /** @return void  */
+  public static function preloadAll()
+  {
+    $entries = static::_getModelClass()::getList();
+    foreach ($entries as $entry) {
+      new static($entry);
+    }
+  }
+
+
+  /** @return array  */
+  public function jsonSerialize(): array
+  {
+    return $this->__toArray();
+  }
+
+  function __toArray(): array
+  {
+    return $this->datas;
+  }
+
+  function __toString(): string
+  {
+    return implode(" ", [
+      "Object",
+      "#" . $this->getId() ?? "null",
+      "of class",
+      static::class,
+    ]);
+  }
+
+  /**
+   * @param array $datas 
+   * @return static 
+   */
+  public static function create(array $datas)
+  {
+    $object = new static($datas);
+    $object->save();
+    return $object;
+  }
+
+  private static function snakeCaseToCamelCase(string $string)
+  {
+    return lcfirst(str_replace('_', '', ucwords($string, '_')));
+  }
+
+  private static function camelCaseToSnakeCase(string $string)
+  {
+    return strtolower(preg_replace('/(?<!^)[A-Z]/', '_$0', $string));
+  }
+
+  public static function getByFilters(
+    array $queryDatas = [],
+    array $filters = [],
+  ): array {
+    $modelClass = static::_getModelClass();
+    if (!method_exists($modelClass, "getByFilters")) {
+      throw new Exception("Model class " . $modelClass . " does not have a getByFilters method");
+    }
+    $ids = $modelClass::getByFilters($queryDatas, $filters, "ids");
+    if (!$ids) return [];
+    return static::getListByIds($ids);
+  }
+
+  public static function getOneByFilters(
+    array $queryDatas = [],
+    array $filters = [],
+  ): ?static {
+    $modelClass = static::_getModelClass();
+    if (!method_exists($modelClass, "getByFilters")) {
+      throw new Exception("Model class " . $modelClass . " does not have a getByFilters method");
+    }
+    $queryDatas["length"] = 1;
+    $id = $modelClass::getByFilters($queryDatas, $filters, "id");
+    if (!$id) return null;
+    return static::getById($id);
+  }
+
+  protected static function _getClass(): string
+  {
+    $overridenClasses = getConfig("overrides.dataObjects") ?: [];
+    if (isset($overridenClasses[static::class])) {
+      return $overridenClasses[static::class];
+    }
+    return static::class;
+  }
+
+  protected static function _getModelClass(): string
+  {
+    $overridenClasses = getConfig("overrides.models") ?: [];
+    if (isset($overridenClasses[static::$_modelClass])) {
+      return $overridenClasses[static::$_modelClass];
+    }
+    return static::$_modelClass;
+  }
+
+  //Fonctions magiques pour les getters et setters, permettent de faire $object->getNomClient() au lieu de $object->getData("nom_client")
+  public function __call($name, $arguments)
+  {
+    $action = substr($name, 0, 3);
+    if ($action == "get") {
+      $key = self::camelCaseToSnakeCase(substr($name, 3));
+      return $this->getData($key);
+    } elseif ($action == "set") {
+      $key = self::camelCaseToSnakeCase(substr($name, 3));
+      return $this->setData($key, $arguments[0]);
+    }
   }
 }

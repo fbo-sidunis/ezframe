@@ -66,12 +66,12 @@ class Extension extends AbstractExtension
     return new Markup("<script type=\"text/javascript\">const $name = JSON.parse(\"" . $string . "\");</script>", "UTF-8");
   }
 
-  public function imgBase64($path)
+  public function imgBase64($imgPath="")
   {
     $assetsPaths = self::getAssetsPaths();
     do {
       $assetPath = array_shift($assetsPaths);
-      $path = ROOT_DIR . $assetPath . $path;
+      $path = ROOT_DIR . $assetPath . $imgPath;
     } while ($assetsPaths && !file_exists($path));
 
     if (!file_exists($path)) {

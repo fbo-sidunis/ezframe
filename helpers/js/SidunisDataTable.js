@@ -1,15 +1,16 @@
-class SidunisDataTable{
+class SidunisDataTable {
   maxPageDiff = 2;
   table = null;
   route = null;
   dataTable = null;
   pagination = null;
   colReorder = false;
+  defaultOrder = [];
   responsive = false;
   columnDefs = [];
   _customPagination = true;
   _customOptions = {};
-  
+
   callbackDataSrc = json => {
   };
   callbackData = d => {
@@ -22,6 +23,7 @@ class SidunisDataTable{
   /**
    * Constructeur
    * @param {object} parameters 
+   * @param {array} parameters.defaultOrder ['column','dir']
    * @param {HTMLTableElement|string} parameters.table
    * @param {string} parameters.route
    * @param {string} parameters.colReorder true/false
@@ -36,14 +38,15 @@ class SidunisDataTable{
    * @param {function} parameters.callbackDrawCallback
    * @param {function} parameters.customOptions
    */
-  constructor(parameters){
+  constructor(parameters) {
     this.setTable(parameters.table ?? null);
     this.setRoute(parameters.route ?? null);
     this.setColReorder(parameters.colReorder ?? false);
+  
     this.setResponsive(parameters.responsive ?? false);
     this.customPagination = parameters.customPagination ?? this.customPagination;
     this.customOptions = parameters.customOptions ?? {}
-    if (this.customPagination){
+    if (this.customPagination) {
       this.setPagination(parameters.pagination ?? null);
       this.setTmplPagination(parameters.tmplPagination ?? null);
     }
@@ -53,58 +56,59 @@ class SidunisDataTable{
     this.setCallbackDataSrc(parameters.callbackDataSrc ?? null);
     this.setCallbackInitComplete(parameters.callbackInitComplete ?? null);
     this.setCallbackDrawCallback(parameters.callbackDrawCallback ?? null);
+    this.setDefaultOrder(parameters.defaultOrder ?? null);
   }
 
-  init(){
+  init() {
     if (this.dataTable) this.dataTable.destroy();
     this.table.style.width = "100%";
     this.dataTable = new DataTable(this.table, this.getOptions());
   }
 
-  setTable(table){
+  setTable(table) {
     let _table = null;
-    if (table instanceof HTMLElement){
+    if (table instanceof HTMLElement) {
       _table = table;
-    }else if (typeof(table) == "string"){
+    } else if (typeof (table) == "string") {
       _table = document.querySelector(table);
     }
-    if (!(_table instanceof HTMLTableElement)){
+    if (!(_table instanceof HTMLTableElement)) {
       throw "La table donnée est invalide"
     }
     this.table = _table;
     return this;
   }
 
-  setPagination(pagination){
+  setPagination(pagination) {
     let _pagination = null;
-    if (pagination instanceof HTMLElement){
+    if (pagination instanceof HTMLElement) {
       _pagination = pagination;
-    }else if (typeof(pagination) == "string"){
+    } else if (typeof (pagination) == "string") {
       _pagination = document.querySelector(pagination);
     }
-    if (!(_pagination instanceof HTMLElement)){
+    if (!(_pagination instanceof HTMLElement)) {
       throw "La pagination donnée est invalide"
     }
     this.pagination = _pagination;
     return this;
   }
-  
-  setTmplPagination(tmplPagination){
+
+  setTmplPagination(tmplPagination) {
     let _tmplPagination = null;
-    if (tmplPagination instanceof HTMLElement){
+    if (tmplPagination instanceof HTMLElement) {
       _tmplPagination = tmplPagination;
-    }else if (typeof(tmplPagination) == "string"){
+    } else if (typeof (tmplPagination) == "string") {
       _tmplPagination = this.pagination.querySelector(tmplPagination) || document.querySelector(tmplPagination);
     }
-    if (!(_tmplPagination instanceof HTMLElement)){
+    if (!(_tmplPagination instanceof HTMLElement)) {
       throw "Le template pagination donné est invalide"
     }
     this.tmplPagination = (_tmplPagination.innerHTML ?? "").trim();
     return this;
   }
 
-  setRoute(route){
-    if (typeof(route) != "string"){
+  setRoute(route) {
+    if (typeof (route) != "string") {
       throw "La route est invalide"
     }
     this.route = route;
@@ -125,8 +129,8 @@ class SidunisDataTable{
     return this.dataTable.column(index);
   }
 
-  setColumns(columns){
-    if (typeof(columns) != "object"){
+  setColumns(columns) {
+    if (typeof (columns) != "object") {
       throw "Les colonnes sont invalides"
     }
     this.columns = columns;
@@ -146,40 +150,44 @@ class SidunisDataTable{
     this.colReorder = colreorder;
     return this;
   }
+  setDefaultOrder(defaultOrder) {
+    this.defaultOrder = defaultOrder;
+    return this;
+  }
 
-  setCallbackInitComplete(callbackInitComplete){
-    if (typeof(callbackInitComplete) != "function"){
+  setCallbackInitComplete(callbackInitComplete) {
+    if (typeof (callbackInitComplete) != "function") {
       return this;
     }
     this.callbackInitComplete = callbackInitComplete;
     return this;
   }
 
-  setCallbackDrawCallback(callbackDrawCallback){
-    if (typeof(callbackDrawCallback) != "function"){
+  setCallbackDrawCallback(callbackDrawCallback) {
+    if (typeof (callbackDrawCallback) != "function") {
       return this;
     }
     this.callbackDrawCallback = callbackDrawCallback;
     return this;
   }
 
-  setCallbackData(callbackData){
-    if (typeof(callbackData) != "function"){
+  setCallbackData(callbackData) {
+    if (typeof (callbackData) != "function") {
       return this;
     }
     this.callbackData = callbackData;
     return this;
   }
 
-  setCallbackDataSrc(callbackDataSrc){
-    if (typeof(callbackDataSrc) != "function"){
+  setCallbackDataSrc(callbackDataSrc) {
+    if (typeof (callbackDataSrc) != "function") {
       return this;
     }
     this.callbackDataSrc = callbackDataSrc;
     return this;
   }
 
-  getOptions(){
+  getOptions() {
     let defaultOptions = {
       paging: true,
       dom: 't',
@@ -191,6 +199,7 @@ class SidunisDataTable{
       columnDefs: this.columnDefs,
       colReorder: this.colReorder,
       responsive: this.responsive,
+      order: this.defaultOrder ?? [0, 'asc'],
       ajax: {
         url: Route.get(this.route),
         dataSrc: json => {
@@ -208,25 +217,25 @@ class SidunisDataTable{
         setTimeout(() => {
           // this.dataTable.columns.adjust();
         }, 100);
-        if (this.customPagination){
+        if (this.customPagination) {
           this.initPagination(this.dataTable);
         }
         this.callbackInitComplete();
       },
       drawCallback: settings => {
-        if (this.customPagination){
+        if (this.customPagination) {
           this.cbPagination(this.dataTable);
         }
         this.callbackDrawCallback(settings);
       }
     };
-    foreach (this.customOptions, (value,key)=>{
+    foreach(this.customOptions, (value, key) => {
       defaultOptions[key] = value;
     })
     return defaultOptions;
   }
-    
-  initPagination(){
+
+  initPagination() {
     let navPagination = this.pagination.querySelector("nav.pagination-nav");
     if (!navPagination) return false;
     let pageNext = navPagination.querySelector("a.page-link.page-next");
@@ -253,7 +262,7 @@ class SidunisDataTable{
     })
   }
 
-  cbPagination(){
+  cbPagination() {
     let navPagination = this.pagination.querySelector("nav.pagination-nav");
     let pageInfo = this.dataTable.page.info();
     if (!navPagination) return console.error("Aucune navPagination");
@@ -287,12 +296,12 @@ class SidunisDataTable{
     add_link(pageInfo.page == 0 ? " active " : "", 0, 1);
     if (0 < (pageInfo.page - this.maxPageDiff - 1)) add_link(" disabled ", "", "...");
     for (let i = pageInfo.page - this.maxPageDiff; i <= (pageInfo.page + this.maxPageDiff); i++) {
-      if (pageInfo.pages > (i+1) && i > 0) add_link(i == pageInfo.page ? " active " : "", i, i + 1);
+      if (pageInfo.pages > (i + 1) && i > 0) add_link(i == pageInfo.page ? " active " : "", i, i + 1);
     }
     if (pageInfo.pages > (pageInfo.page + this.maxPageDiff + 2)) add_link(" disabled ", "", "...");
     if (pageInfo.pages > 1) add_link(pageInfo.page == (pageInfo.pages - 1) ? " active " : "", pageInfo.pages - 1, pageInfo.pages);
   }
-  
+
   get customOptions() {
     return this._customOptions;
   }

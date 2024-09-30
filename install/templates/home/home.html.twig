@@ -1,43 +1,23 @@
 {% extends 'layout.html.twig' %}
+{% set title_content = 'Accueil' %}
+{% set title_icon_class = 'fa-solid fa-home' %}
+{% set SITE_TITLE = title_content %}
+
+{% block include_additional_libs %}
+  {{ script('assets/js/home/home.js') }}
+{% endblock %}
+
 {% block body %}
   {% if xdebug == 2 %}
     {% set xdtemplate = _self %}
     {% include 'xdeb2.html.twig' %}
   {% endif %}
-  <div class="container mx-auto">
-    <div class="row my-5">
-      <div class="col-4">
-        <a href="{{ Route.get('devis') }}"><button type="button" class="btn btn-primary p-3 w-100">Créer un devis <i class="fass fa-calculator"></i></button></a>
-      </div>
-    </div>
-    <div class="row my-3">
-      <h5>Statistiques sur 30 jours glissants<hr /></h5>
-      <div class="col-md-8 col-sm-12">
-        <div class="card me-md-1 mb-sm-3">
-          <div class="card-header">
-            <strong>Nombre de devis créés par jours</strong>
-          </div>
-          <div class="card-body"></div>
-        </div>
-      </div>
-      <div class="col-md-4 col-sm-12">
-        <div class="card ms-md-1">
-          <div class="card-header">
-            <strong>Statuts devis</strong>
-          </div>
-          <div class="card-body"></div>
-        </div>
-      </div>
-    </div>
-    <div class="row my-3">
-      <div class="col-12">
-        <div class="card">
-          <div class="card-header">
-            <strong>Nouveaux clients</strong>
-          </div>
-          <div class="card-body"></div>
-        </div>
-      </div>
+  <div class="container">
+    <div class="row">
+      <h1>Welcome...</h1>
+      <span>Documentation du framework disponible ici : 
+      <br>
+      <a href="http://192.168.10.221/documentation/doc?p=pour-commencer" target="_blank">http://192.168.10.221/documentation/</a>
     </div>
   </div>
 {% endblock %}

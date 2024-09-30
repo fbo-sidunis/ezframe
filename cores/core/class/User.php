@@ -118,18 +118,27 @@ class User
     return in_array($role,$this->getRoles());
   }
 
-  public function hasOneRole($roles = [])
+ public function hasOneRole($roles = [])
   {
     if ($roles === null) return true;
     if ($roles === []) return true;
-    return !empty(array_intersect($roles ?: [],$this->getRoles()));
+    if (!empty($this->getRoles()) && is_array($roles) && is_array($this->getRoles())) {
+      return !empty(array_intersect($roles ?: [], $this->getRoles()));
+    } else {
+      return false;
+    }
   }
 
   public function hasRoles($roles = [])
   {
     if (empty($roles)) return true;
-    return count(array_intersect($roles ?: [],$this->getRoles())) === count($roles);
+    if (!empty($this->getRoles()) && is_array($roles) && is_array($this->getRoles())) {
+      return count(array_intersect($roles ?: [], $this->getRoles())) === count($roles);
+    } else {
+      return false;
+    }
   }
+
 
   /**
    * Set the value of id

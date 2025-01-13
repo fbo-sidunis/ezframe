@@ -64,7 +64,8 @@ class CommandHandler
   {
     $options = [];
     foreach ($_SERVER['argv'] as $key => $value) {
-      if (preg_match("/^--([a-z]+)=([a-z0-9]+)$/i", $value, $matches)) {
+      //if (preg_match("/^--([a-z]+)=([a-z0-9]+)$/i", $value, $matches)) {
+      if (preg_match("/^--([a-z]+)=([\w-]+)$/i", $value, $matches)) {
         $options[$matches[1]] = $matches[2];
       }
     }
